@@ -1,0 +1,1 @@
+from pdfdefaults.defaults import setup, a4_textwidth, dpi
