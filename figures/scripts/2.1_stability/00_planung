@@ -1,0 +1,41 @@
+Fragen:
+----
+Instabilität über 
+(a) zeit, temperatur
+(b) kanal
+(c) neustart
+(d) neu-konfig
+
+
+Untersuchen:
+(a) varianz [v] zeitplot einzelner kanäle [v] zeitplot einzelner kanäle für >12h [v] kanalmittelwert über t [v]
+(b) {mean, var} kanäle [v] kanaldifferenzen [v] unterschiede zwischen chips [v]
+(c) startwert phasendifferenz desselben kanals []
+(d) kanalmittelwert über zeit []
+ kanaldifferenzen: scatter amplitude/abstand rx-tx und boxplt amplitude/chip
+ runtime-kalibrierung an/aus?
+
+Beobachtungen:
+1. Relativ großer Phasendrift beim aufheizen: +20°C => +/- 10° drift (aber nur -1dB amplitudendrift)
+    ABER: phasendrift nach neustart geht weiter, auch wenn temp stabilisiert!
+2. Neustart/Neukonfig ändern Phase bis zu 5°
+3. Unterschiede zwischen Kanälen, aber kein erkennbares Muster
+4. Reflektor bewegt sich -> berücksichtigen
+
+TODO für "Endgame" nach Prio
+
+[v] Reboot/reconf messung Wdh                 30.10., 31.10.
+[v] gedrehter sensor (nur ein \dot \omega)    31.10.                      Azimuth-Array Differenzen benachbarter Kanäle
+
+[ ] MA kapitel Stabilitätsmessungen schreiben 
+[ ] Research Backprojection
+[ ] Präsi Zwischenvortrag
+
+-> bis 14.11.
+
+
+Ausstehende Messungen 
+
+[ ] Langzeitmessung, steilere Rampe           8.-9.11.
+[ ] anderes Frontend                          bonus
+

@@ -1,6 +1,115 @@
 \chapter{Introduction}
 \section{Theoretical Background}
-\subsection{Physical Setup}
 \subsection{Signal Model}
+\subsubsection*{Single Channel FMCW}
+A single channel consists of a transmit antenna and a receive antenna.
+The transmit antenna sends a so-called chirp of duration $T_{chirp}$,
+which is a sinusoid with linearly increasing frequency.
+The signal $x_{TX}(t)$ send by the transmit antenna is reflected by an ideal point scatterer at position $\vec r_S$
+and then received at the receive antenna as $x_{RX}(t)$.
+The propagation delay $\tau$ can be calculated using the speed of light $c_0$,
+and the locations of the receive and transmit antennas $\vec r_{RX}$ and $\vec r_{TX}$:
+\begin{align}
+    \tau = \frac{\| \vec r_{TX} - \vec r_S \|+\| \vec r_{RX} - \vec r_S \|}{c_0}
+\end{align}
+Using a complex representation for the in-phase and quadrature components of the signal,
+the transmit and receive signal can be formulated for $t \in [0, T_{chirp}]$:
+\begin{align}
+    x_{TX}(t) & = A_0 e^{j(\omega_0t + \frac{1}{2}\dot \omega t^2 + \phi_0)} \label{eqn:x_TX} \\
+    x_{RX}(t) & = A(\vec r_S) x_{TX}(t-\tau)                                 \label{eqn:x_RX} \\
+\end{align}
+The received signal is then mixed with a copy of the transmitted signal (\ref{eqn:x_TX}) and a low-pass filter is applied.
+The resulting signal $y(t)$ is called \textit{intermittent frequency} signal.
+\begin{align}
+    y(t) & = \text{LP} \left\{ x_{RX}(t) \cdot x_{TX}(t) \right\} \\
+         & = \text{LP} \left\{
+    A_0 e^{j(\omega_0t + \frac{1}{2}\dot \omega t^2) }
+    \cdot A(\vec r_S) A_0 e^{j(\omega_0(t-\tau(\vec r)) + \frac{1}{2}\dot \omega (t-\tau(\vec r))^2) }
+    \right\}                                                      \\
+         & = A_0^2A(\vec r_S)
+    e^{j(\frac{1}{2}\dot\omega\tau^2(\vec r_S)- \omega_0\tau)}
+    \cdot  \text{LP} \left\{
+    e^{j(2\omega_0 t + \frac{1}{2}\dot\omega t^2 - \dot\omega\tau t)}
+    \right\}                                                      \\
+         & \approx G(\vec r_S) e^{-j\dot\omega\tau t}
+\end{align}
+The fact that the IF-signal contains all the information
+-- i.e. the IF signal's frequency directly corresponds to the target's distance --
+explains the main advantage of this technology.
+The carrier frequency can be orders of magnitude higher than the intermittent frequency,
+which drastically reduces the requirements for the subsequent signal processing,
+while retaining the improved resolution due to the smaller wavelenghts of the carrier frequency.
+
+FIND QUOTE: "GHz resolution for MHz processing"
+
+To locate a target in the cross-range dimensions,
+a single-channel FMCW-radar can be used to scan in multiple directions,
+by either rotating the antennas, redirecting their beam with rotating mirrors, or with beamforming antenna arrays.
+In any case, this requires highly directive antennas and also increases size, weight and cost of a radar sensor.
+
+\subsubsection*{MIMO FMCW}
+Multiple-input multiple-output radar benefits from increased diversity and signal power.
+If $M$ transmit antennas and $N$ receive antennas are employed, $K=M \cdot N$ channels are available.
+To differentiate the signals from each other, a multiplexing technique has to be chosen.
+Options include time division multiplex, frequency division multiplex and code division multiplex. \\
+
+In TDM, multiple access is achieved by the transmit antennas all send one after another,
+while all receive antennas receive simultaneously.
+In FDM, simultaneous transmission is made possible by subdividing the bandwidth and assigning a different frequency range to each antenna.
+That means that TDM allows for higher bandwidths for each transmission, while FDM allows higher transmission durations.
+
+In CDM, both simultaneous transmission and use of the entire bandwidth is made possible by using a different waveform to each channel.
+However, processing at the carrier frequency is required to differentiate the signals from another, as opposed to TDM and FMD,
+where all processing can be done at the intermittent frequency range.
+
+Depending on the application, a compromise has to be found between the advantages and drawbacks of each method.
+There are also methods available that combine aspects of these three basic paradigms, such as OFDM and Hadamard-Coding. \\
+
+Once the received signals are demultiplexed, the ideal receive signal for antenna pair $k \in \{0,1,...K-1\}$:
+
+\begin{align}
+    y_k(t) & = G_k(\vec r_S)e^{-j\dot\omega\tau_k(\vec r_S)t}
+\end{align}
+Note that both the gain and the propagation delay may differ from channel to channel.
+
+In reality, the scene can consist of multiple and expansive scatterers,
+that reflect the transmitted signals at different intensities.
+which is summarized as a locational reflectivity $F_k(\vec r)$.
+\footnote{
+    The index $k$ is introduced here to take obstructed visibility into account:
+    from the point of view of one channel, two scatterers may be visible simultaneously,
+    while from the point of view of another, one might obstruct the other's visiblity.
+}
+Also, interference and electric noise may be present in each channel,
+which we summarize as $n_k(t)$.
+Thus, the overall IF-signal is:
+\begin{align}
+    y_k(t) & = \iiint F_k(\vec r)G_k(\vec r) e^{-j\dot\omega\tau_k(\vec r)t} \;d\vec r + n_k(t) \\
+\end{align}
+After sampling the signal at sampling intervals $T_s$ such the sampling frequency $f_s = \frac{1}{T_s}$
+is sufficiently high: ${2f_s > \frac{1}{2\pi}(\omega_0 + \dot \omega T_{chirp})}$, and with $M$ samples such that $MT_s < T_{chirp}$,
+the sampled IF-signal can be defined as:
+\begin{align}
+    y_k[m] = y_k(t=mT_s), \text{for}\;m \in \{0,1,..M-1\}
+\end{align}
 \subsection{Calibration}
+
 \subsection{Image Reconstruction}
+Image reconstruction is the inverse problem of estimating the locational reflectivity of the scene $F(\vec r)$
+from the received signals $y_k[m]$. Multiple approaches are available; in the following, three will be presented.
+
+\subsubsection*{Discrete Fourier Transform}
+The discrete fourier transform can be implemented with high efficiency, and many CPUs even include silicone-based implementations.
+In this approach, the DFT is applied over three dimensions of the input signal,
+obtaining a discrete output signal in spherical coordinates whose amplitude is an estimate of the locational reflectivity.
+
+For each input channel, the range of a target can be estimated by applying the DFT over time.
+The resulting spectrum's peak corresponds to the target:
+\begin{align}
+    \mathcal{F}\{y_k(t)\}(\omega) = G_k(\vec r_S) \delta(\omega-\dot \omega \tau_k(\vec r_S))
+\end{align}
+
+The cross-range dimensions can also be calculated using the FFT, but some approximations have to be made.
+Suppose $K_\theta \subset \{0,1,...,K-1\}$ is a set of channels
+\section{Physical Setup}
+
