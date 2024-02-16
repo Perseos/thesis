@@ -1,6 +1,132 @@
 \chapter{Introduction}
+
+Radar technology has undergone significant advancements over the decades,
+revolutionizing various fields including aerospace, defense, automotive, and healthcare.
+Its fundamental principle of using electromagnetic waves to detect the presence,
+direction, distance, and speed of objects has enabled myriad applications, ranging from weather monitoring to target tracking.
+
+Within this expansive domain, Frequency Modulated Continuous Wave (FMCW)
+Multiple Input Multiple Output (MIMO) Millimeter Wave (mmWave) radar systems have emerged
+as a cutting-edge solution with unparalleled capabilities.
+FMCW radar, characterized by its continuous transmission of frequency-modulated signals,
+combined with MIMO architecture, which utilizes multiple antennas for both transmission and reception,
+has enabled enhanced spatial resolution, improved target detection, and increased resilience to interference.
+Operating in the mmWave spectrum, typically within the frequency range of 24 to 100 GHz,
+these radars offer advantages such as high resolution, immunity to environmental conditions
+like fog and precipitation, and the ability to accommodate large bandwidths for high data rates.
+
+The fusion of FMCW, MIMO, and mmWave technologies represents a significant leap forward in radar sensing,
+promising to address the evolving demands of modern applications ranging from autonomous vehicles to biomedical imaging.
+This thesis endeavors to contribute to this dynamic field by proposing and evaluating
+novel imaging algorithms optimized for FMCW MIMO mmWave radar systems, with a focus on
+enhancing their performance, efficiency, and applicability across diverse scenarios and applications. \\
+
+Radar technology finds diverse applications across various industries, with one notable area being mining.
+In the mining sector, radar systems play a crucial role in enhancing safety, efficiency, and productivity.
+
+Radar-based collision avoidance systems are employed in mining operations to prevent accidents involving heavy machinery and personnel.
+These systems utilize radar sensors to detect nearby objects and provide real-time alerts to operators,
+facilitating safe maneuvering in challenging environments.
+
+Moreover, radar technology is instrumental in various logistical aspects of mining operations.
+It is utilized for stockpile management, enabling accurate measurement and monitoring of ore and waste material reserves,
+optimizing inventory control and resource allocation.
+Radar sensors are also integrated into silo and train loading processes, ensuring efficient and precise transfer of bulk materials onto transport vehicles.
+Furthermore, radar-based systems facilitate ship unloading and berthing operations at port facilities, streamlining the handling of bulk commodities.
+One significant advantage of radar systems over visual-based solutions in mining environments is their resilience to omnipresent dust and grime.
+Unlike optical systems, radar sensors are not affected by adverse weather conditions or obstructed visibility,
+ensuring reliable performance and continuous operation even in harsh mining environments.\\
+
+In the realm of radar sensing, various approaches exist for achieving multidimensionality in imaging.
+Traditional radar systems employ one-dimensional (1D) sensors, which provide information along a single axis, typically range.
+These sensors are adept at measuring distances to targets but lack detailed spatial information.
+To overcome this limitation, two-dimensional (2D) sensors have been developed,
+capable of scanning in both range and azimuth dimensions, providing a more comprehensive view of the surrounding environment.
+These sensors often achieve multidimensionality either mechanically,
+by utilizing mechanisms such as rotating antennas or electronically with phased arrays to sweep the radar beam across the scene.
+Additionally, three-dimensional (3D) radar sensors offer even greater spatial resolution by adding an elevation dimension to the azimuth and range measurements.
+These sensors are commonly used in applications requiring detailed volumetric imaging.
+The mechanical movement or rotation of the sensor enables it to scan the scene from multiple angles, capturing information in three dimensions.\\
+
+The evolution of radar technology has led to the development of advanced imaging techniques
+that leverage the principles of Multiple Input Multiple Output (MIMO) radar systems.
+These systems, characterized by their use of multiple transmit and receive antennas,
+offer significant improvements in imaging performance compared to traditional radar architectures.
+One key advantage of MIMO radar is its ability to achieve multidimensional imaging without the need for
+mechanically rotating antennas. By utilizing multiple antennas in a static configuration,
+MIMO radar systems can capture spatial information along multiple dimensions simultaneously,
+leading to enhanced imaging capabilities at reduced cost and complexity. Additionally,
+MIMO radar systems offer the potential for higher frame rates compared to traditional radar systems.
+With multiple antennas operating in parallel, MIMO radar can sample the scene more frequently,
+enabling rapid data acquisition and real-time imaging of dynamic environments.
+The next step in the advancement of MIMO imaging radars involves the development and optimization
+of sophisticated signal processing algorithms tailored to exploit the full potential of these systems.
+These algorithms aim to extract rich spatial information from the received signals,
+enabling high-fidelity imaging of complex scenes with unprecedented detail and accuracy. \\
+
+
+Current 3D imaging algorithms employed for many FMCW MIMO radars rely on the Fast Fourier Transform (FFT)
+technique for generating three-dimensional reconstructions of the observed scene.
+This algorithm computes each dimension of the image by performing an FFT on a different dimension
+of the Intermediate Frequency (IF) signal obtained from the radar's input data.
+
+Specifically, the range dimension corresponds to the time dimension of the input signal,
+while the azimuth and elevation dimensions are computed from horizontal and vertical channels, respectively.
+One of the primary strengths of this approach lies in its fast implementation,
+allowing for rapid processing of radar data. However, despite its efficiency,
+the FFT-based algorithm suffers from several limitations.
+
+These include near-field distortion issues,
+restrictions in applicability to Uniform Linear Arrays (ULA),
+the necessity for array calibration, and the inability to utilize measured antenna gains effectively.
+Moreover, the algorithm is prone to ringing artifacts, which can degrade the quality of reconstructed images,
+particularly in complex or cluttered environments. \\
+
+In response to the limitations of the current FFT-based approach,
+a novel back projection algorithm is proposed for 3D imaging in the FMCW MIMO radar system.
+Unlike the FFT-based method, the proposed algorithm offers increased flexibility and versatility in image reconstruction.
+One of its key advantages is the elimination of ringing artifacts, which commonly plague FFT-based reconstructions.
+Additionally, the back projection algorithm is capable of addressing near-field distortion issues and is suitable
+for both near- and far-field imaging scenarios. Moreover, it exhibits compatibility with non-ULA arrays,
+enabling broader applicability across different radar configurations. A notable feature of the proposed algorithm
+is its ability to incorporate measured antenna gains effectively, leading to more accurate and reliable imaging results.
+By leveraging these advantages, the back projection algorithm promises to significantly enhance the imaging capabilities of the FMCW MIMO radar,
+paving the way for improved performance and expanded applications in various domains. \\
+
+In this thesis, we embark on a comprehensive exploration of advanced imaging techniques for FMCW MIMO radar systems,
+aiming to address existing challenges and enhance imaging performance.
+
+Chapter 1 provides a thorough examination of
+the theoretical background underpinning radar imaging, including signal models and a detailed description of the image reconstruction methods.
+We delve into the intricacies of both FFT-based and proposed back projection algorithms.
+Furthermore, a detailed hardware description of the FMCW MIMO radar system under investigation is presented,
+laying the foundation for subsequent experimental chapters.
+
+Chapter 2 focuses on measurements and validation of hardware stability
+through extensive static measurements. Through rigorous analysis, we assess the stability of the radar system and measure antenna gains,
+crucial for accurate imaging.
+
+Chapter 3 shifts the focus to imaging algorithms, detailing the implementation of the back projection algorithm using PyTorch.
+Additionally, we discuss the interpolation of measured gains and evaluate the performance enhancements achieved through these refinements.
+
+By presenting comprehensive results and analyses, this thesis aims to contribute to the advancement of FMCW MIMO radar imaging technology,
+with implications for various applications in fields such as remote sensing, autonomous vehicles, and surveillance.
+
 \section{Theoretical Background}
+This section provides a foundation for understanding the principles and methodologies underpinning FMCW MIMO radar imaging.
+We begin by elucidating the signal model employed in FMCW radar systems, elucidating the distinctions between single-channel and MIMO configurations.
+Subsequently, we delve into the intricacies of image reconstruction techniques,
+exploring both the Discrete Fourier Transform (DFT) approach and the proposed backprojection algorithm.
+
 \subsection{Signal Model}
+Understanding the signal model is fundamental to grasp the operation and capabilities of FMCW MIMO radar systems.
+In this section, we delve into the intricacies of the signal model,
+beginning with an exploration of Single Channel Frequency Modulated Continuous Wave (FMCW) radar systems.
+We clarify the key principles governing their signal generation and processing,
+laying the groundwork for a comprehensive understanding of radar imaging techniques.
+Then, we extend our analysis to encompass Multiple Input Multiple Output (MIMO) FMCW radar systems,
+highlighting the unique characteristics and complexities associated with their signal model.
+
 \subsubsection*{Single Channel FMCW}
 A single channel consists of a transmit antenna and a receive antenna.
 The transmit antenna sends a so-called chirp of duration $T_{chirp}$,
@@ -110,8 +236,8 @@ obtaining a discrete output signal in spherical coordinates whose amplitude is a
 For each input channel, the range of a target can be estimated by applying the DFT over time.
 The resulting spectrum's peak corresponds to the target:
 \begin{align}
-    \mathcal{F}_m\{y_k[m]\}(\Omega) & = \sum_{m=0}^{M-1} e^{-j2\pi\frac{m\Omega}{M}} y_k[m]          \\
-                                    & = G_k(\vec r_S) \delta(\Omega-\dot \omega \tau_k(\vec r_S)T_s)
+    \mathcal{F}_m\{y_k[m]\}(\Omega) & = \sum_{m=0}^{M-1} e^{-j2\pi\frac{m\Omega}{M}} y_k[m]                            \\
+                                    & = G_k(\vec r_S) \delta(\Omega-\dot \omega \tau_k(\vec r_S)T_s) \label{eqn:y_fft}
 \end{align}
 
 
@@ -251,4 +377,21 @@ preprocessing can also be done after receiving the signal.
 Spacial smoothing, as proposed by [CITE], improves the correlation matrix's eigenstructure by
 
 \section{Physical Setup}
+The sensor employed in this thesis operates on Multiple Input Multiple Output (MIMO) Frequency Modulated Continuous Wave (FMCW) technology,
+showcasing advanced features tailored for precise radar imaging.
+It offers a range capability of less than 100 meters, extendable up to 800 meters with active beamforming techniques.
+The sensor achieves a remarkable range resolution of 3.8 millimeters, enabling detailed imaging of objects within its detection range.
+
+Utilizing a sawtooth or chirp signal type, the sensor employs Time Division Multiplexing (TDM) in Transmission (Tx) for efficient multiplexing.
+Operating within the frequency range of 77 to 81 gigahertz (GHz),
+it leverages the millimeter-wave spectrum to achieve high-resolution imaging suitable for a variety of applications.
+
+The chirp duration of the sensor is between 60 to 70 microseconds, ensuring effective signal processing and data acquisition.
+Equipped with 12 transmit (Tx) antennas and 16 receive (Rx) antennas, the sensor offers comprehensive coverage and sensitivity,
+facilitating robust imaging performance.
+
+Furthermore, the sensor's Intermediate Frequency (IF) samplerate is set at 22 megahertz (MHz),
+providing sufficient bandwidth for accurate signal processing and analysis.
+This combination of advanced features and specifications positions the sensor as a versatile and effective tool for radar imaging tasks in diverse scenarios,
+ranging from automotive safety systems to industrial sensing applications.
 

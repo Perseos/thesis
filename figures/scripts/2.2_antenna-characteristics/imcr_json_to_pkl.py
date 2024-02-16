@@ -4,7 +4,10 @@ M = 1022
 N_Rx = 16
 N_Tx = 12
 K = N_Rx*N_Tx
-FSR = 2**8
+# FSR = 2**8 FALSCH
+FSR = 2**11
+
+L_max = 1000
 
 def sel(D:dict, p:str):
     result = D
@@ -12,11 +15,21 @@ def sel(D:dict, p:str):
         result = result[sub]
     return result
 
+
+def save_data(data:torch.Tensor, angle:list, timestamp:list, suffix=None):
+    torch.save(data, sys.argv[1]+suffix+'_data.pt')
+    with open(sys.argv[1]+suffix+'_angle.pkl', 'wb') as handle:
+        pickle.dump(angle, handle)
+    with open(sys.argv[1]+suffix+'_timestamps.pkl', 'wb') as handle:
+        pickle.dump(timestamp, handle)
+
 data = []
 angle = []
 timestamp = []
 current_angle = float('nan')
 framecounter = 0
+was_split = False
+partcounter = 0
 
 for line in sys.stdin:
     j = json.loads(line)
@@ -36,11 +49,22 @@ for line in sys.stdin:
             frame[:,c*N_Rx:(c+1)*N_Rx] = torch.complex(real,imag).reshape((N_Rx,M)).T
         data.append(frame)
         framecounter += 1
-print('\nSaving data...')
 
-torch.save(torch.stack(data,-1), sys.argv[1]+ '_data.pt')
-with open(sys.argv[1]+ '_angle.pkl', 'wb') as handle:
-    pickle.dump(angle, handle)
-with open(sys.argv[1]+ '_timestamps.pkl', 'wb') as handle:
-    pickle.dump(timestamp, handle)
+    if framecounter > L_max:
+        print(f'\nSaving data part {partcounter:02d}...')
+        save_data(torch.stack(data,-1), angle, timestamp, f'_{partcounter:02}')
+        data = []
+        angle = []
+        timestamp = []
+        framecounter = 0
+        was_split = True
+        partcounter += 1
+    
+if not was_split:
+    print(f'\nSaving data ...')
+    save_data(data,angle,timestamp)
+elif framecounter > 0:
+    print(f'\nSaving data part {partcounter:02d}...')
+    save_data(torch.stack(data,-1), angle, timestamp, f'_{partcounter:02}')
+
 

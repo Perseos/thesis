@@ -1,10 +1,12 @@
 import matplotlib.pyplot as plt
 from matplotlib.ticker import EngFormatter
-import torch, pickle
-
-
+import torch, pickle, sys
+sys.path.append('/home/dgotzens/scripts/')
+import pdfdefaults as pdf
 # setup
-nfft = 2_048
+pdf.setup()
+nfft = 2**10
+
 pi = 3.141592653589 
 maxdist = 50
 lightspeed = 299_792_458 
@@ -17,47 +19,36 @@ bins_per_meter = nfft / maxdist
 folder = '/home/dgotzens/recording/'
 
 
-fig, ax = plt.subplots(2,2, sharex=True, sharey=True)
-fig.set_size_inches((16,10))
-for n, orientation in enumerate("dabc"):
-    for dist in (2,8,18,32):
-
-        # load measurement
-        print(f'loading measurement (orientation {orientation.upper()}, range {dist}m)...')
-
-        data = torch.load(f'{folder}{orientation}{dist:02d}_data.pt')
-        M,K,L = data.shape
-        with open(f'{folder}{orientation}{dist:02d}_timestamps.pkl', 'rb') as f:
-            timestamps = pickle.load(f)
-        with open(f'{folder}{orientation}{dist:02d}_angle.pkl', 'rb') as f:
+fig, ax = plt.subplots(2, sharex=True, sharey=True)
+fig.set_size_inches(pdf.a4_textwidth, 1.3*pdf.a4_textwidth)
+for m, measurement in enumerate(('a','d')):
+    for n, dist in enumerate((2,8,18,32)):
+        with open(f'{folder}{measurement}{dist:02d}_angle.pkl', 'rb') as f:
             angle = pickle.load(f)
+        l_deg = [l for l,a in enumerate(angle) if -90 < a*180/pi-90 < 90]
+        angle_deg = [a*180/pi - 90 for l,a in enumerate(angle) if l in l_deg]
+        data = torch.load(f'{folder}{measurement}{dist:02d}_data.pt')[:,:,l_deg]
+        M,K,L = data.shape
 
-        
+        print(f'loaded data for {dist}m. processing...')
 
-        # calculate mean 
-        window = torch.hann_window(M).unsqueeze(-1)
-        window = window / window.sum() * 2**15
-        bp = torch.zeros(nfft)
         bp_start = int((dist-0.5)*bins_per_meter)
         bp_len = int(1*bins_per_meter)
-        bp[bp_start:bp_start+bp_len] = torch.hann_window(bp_len)
-        bp = bp.unsqueeze(-1)
 
-        data_abs_mean = torch.zeros(L)
-        for k in range(K):
-            fft = torch.fft.fft(window*data[:,k,:], n=nfft, dim=0)
-            data_abs_mean += torch.mean(fft.abs()*bp, dim=0)/K
+        window = torch.hann_window(M)
+        window = window / window.sum()
 
-        with open(f'/home/dgotzens/scripts/2.2_antenna-characteristics/{orientation}{dist:02d}_out.pkl', 'wb') as f:
-            pickle.dump((angle, data_abs_mean), f)
-        # plot data
-        ax[n//2, n%2].plot([180/pi*a-90 for a in angle], 20*data_abs_mean.log10(), label=f'r={dist}m')
-    ax[n//2, n%2].yaxis.set_major_formatter(EngFormatter(unit='dB'))
-    ax[n//2, n%2].xaxis.set_major_formatter(EngFormatter(unit='°'))
-    ax[n//2, n%2].set_title(f'Sensor Orientation {orientation.upper()}')
-    ax[n//2, n%2].set_xlabel('Angle')
-    ax[n//2, n%2].set_ylabel('Level')
-    ax[n//2, n%2].legend()
-    ax[n//2, n%2].grid()
+        gain = torch.empty(L)
 
-fig.savefig('/home/dgotzens/Schreibtisch/mean_amp.png')
+        fft = torch.fft.fft(window[:,None,None]*data, n=nfft, dim=0)
+        m_refl = fft[bp_start:bp_start+bp_len,:,:].abs().mean(1).argmax(0) + bp_start
+        gain = fft.abs().mean(1)[m_refl, range(L)]
+        ax[m].plot(angle_deg, 20*gain.log10(), label=f'{dist}m')
+    ax[m].yaxis.set_major_formatter(EngFormatter('dBFS'))
+    ax[m].set_ylabel('level')
+    ax[m].set_xlabel('rotation')
+    ax[m].xaxis.set_major_formatter(EngFormatter('°'))
+    ax[m].grid()
+    ax[m].legend()
+    ax[m].set_title('horizontal' if m==0 else 'vertical')  
+fig.savefig('/home/dgotzens/thesis/figures/mean_amp.pdf')

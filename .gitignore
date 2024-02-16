@@ -66,3 +66,5 @@ tex/chapters/calibration.aux
 tex/chapters/imaging.aux
 tex/chapters/intro.aux
 tex/chapters/results.aux
+figures/scripts/2.2_antenna-characteristics/measured/*
+figures/scripts/3.1_imaging/measured_gains/*

@@ -1,5 +1,4 @@
-- figure of merit
-- ausgabebereich/auflösung reduzieren
-- interpolation zur FFT-Rettung
-- warum radiale aufweichung?
-- validieren: 1D-z-querschnitt plotten 
+o figure of merit
+o Optimierung durch
+    - nur punkte mit einem minimum an antenna gain untersuchen
+    - adaptive sampledichte (bei voxeln mit hoher signalstärke samplerate verdoppeln)
