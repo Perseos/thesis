@@ -1,4 +1,4 @@
-
+\newpage
 \section{Stability Analysis}
 \label{sec:stability_analysis}
 
@@ -65,7 +65,6 @@ and other peaks at higher and lower frequencies will be present due to incomplet
 Also, the reflector peak may wander if the setup geometry moves. \\
 For analysis, system runtime and temperature cannot be considered independent variables, as illustrated in figure \ref{fig:exp_temp}:
 The system starts at ambient temperature, heating up and approaching a stable operating temperature on turning on ($t_0$), and cooling back down after turning off ($t_1$). \\
-\subsection{Results}
 \begin{figure}[h]
     \centering
     \begin{subfigure}[t]{.45\textwidth}
@@ -81,7 +80,7 @@ The system starts at ambient temperature, heating up and approaching a stable op
     \caption{Mean Intensity Spectrum}
     \label{fig:avg_intensity}
 \end{figure}
-\subsubsection*{Preprocessing and Analysis}
+\subsection{Preprocessing and Analysis}
 Because of the aforementioned imperfections in the experiment, some preprocessing is required to analize the systematic offsets present in the radar signal.
 Multiple additional peaks in the spectrum are visible in figure \ref{fig:avg_intensity}; indeed, the maximum peak is not even caused by the reflector.
 It is therefore necessary to limit the analysis to only the FFT-bin at the maximum of the peak caused by the reflector.
@@ -91,7 +90,7 @@ This shows by the spectral maximum shifting over time, as seen in figure \ref{fi
 
 \begin{figure}
     \centering
-    \includegraphics[height=0.25\textheight]{../figures/refldist.pdf}
+    \includegraphics[width=\textwidth]{../figures/refldist.pdf}
     \caption{Change in reflector distance as measured by iMCR}
     \label{fig:refldist}
 \end{figure}
@@ -99,7 +98,7 @@ This shows by the spectral maximum shifting over time, as seen in figure \ref{fi
 In the following analysis, the main metric is the complex ratio of the maximum FFT-bin to its initial value.
 Using a logarithmic representation  of this ratio, it can be represented as a level difference [\unit{\decibel}] and a phase difference [\unit{\degree}].
 
-\subsubsection*{Effects of System Temperature and Runtime}
+\subsection{Effects of System Temperature and Runtime}
 
 Multiple measurements have indicated that, while the amplitude rarely varies by more than \SI{1}{\decibel}, the phase is not as stable over time.
 Typically, the mean phase drifts by up to \SI{50}{\degree} in the hours after system startup, with the rate of change reducing after around four hours.
@@ -113,36 +112,45 @@ the reduction in drift only occurs hours after the system has reached a stable t
     \caption{Recorded drift over night}
     \label{fig:weekend}
 \end{figure}
+TODO : split new measurement into heating up (23:00-8:00) and stable (13:00-12:00).
 
-\subsubsection*{Effects of Self-Calibration}
+
+\subsection{Effects of Self-Calibration}
 As described in the specification, the AWR2243P-chips undergo a self-calibration upon initialization.
 This initialization can be triggered by either restarting the entire system or by re-writing the configuration registers on the radar chips.
 Indeed, this initial calibration can be observed in the data (cf. \ref{fig:restart}).
 After the connection with the radar has been re-established, the following effects are visible:
 \begin{itemize}
     \item slightly increased level: the level in each channel increases by approximately \SI{0.3}{\decibel}
-    \item increased incoherence: after re-starting the system, the drift in both level and phase is distributed more broadly
+    \item increased incoherence: after the first restart of the system, the drift in both level and phase is distributed more broadly
     \item mean phase: the mean phase drift changes by up to \SI{5}{\degree}
 \end{itemize}
 
 \begin{figure}
     \centering
-    \includegraphics[width=\textwidth]{../figures/meas_23-10-30_phase_drift.pdf}
+    \includegraphics[width=\textwidth]{../figures/meas_23-10-30_reboots_phase_drift.pdf}
     \caption{Recorded drift and temperature with system restart}
     \label{fig:restart}
 \end{figure}
 
+TODO: graph jumps to new phase before reboot. confirm or fix.
 
-\subsubsection*{Differences between Antenna Pairs}
-Comparing the amplitude recorded by all antenna pairs, no channel in particular stands out.
+TODO: quantify amount of discontinuity
+
+
+\subsection{Antenna Separation}
+TODO: split gains like in 3.3.7
+
+\subsection{Differences between Antennas}
+TODO: Plots, antenna Separation
+
+Comparing the amplitude recorded by all antenna pairs, no channel in particular stands out [PLOT NEEDED].
 When looking at the different channels phase drifts, it can be seen that the array becomes less coherent over time.
-The distribution of phase shift across channels seems roughly gaussian, with increasing variance over time.
+The distribution of phase shift across channels seems roughly gaussian [PLOT NEEDED], with increasing variance over time.
 No antenna pair seems more prone to incoherence than the rest:
 across measurements, the maximum outlier (in terms of divergence from the mean phase) cannot be associated with a chip or antenna.
 
-\subsubsection*{Effects of the Recorded Frequency and Angle}
-- ?
-\subsubsection*{Conclusion}
+\subsection{Conclusion}
 The systematic offsets of the system are now better described.
 While the amplitude of the measured signal is relatively stable, the phase is affected more strongly.
 All channels' phases drift from both their initial value and each other over time.
@@ -155,5 +163,8 @@ Furthermore, restarting the system will change the systematic offsets due to the
 Adaptive online calibration would be required to deal with these effects. \\
 
 To limit the scope of this thesis, the focus is set on the offline-part of the calibration process.
-Since the speed at which the array incoherence grows is limited, it can be considered static during sufficiently short measurements.
-Also, because these offsets are affected by the automatic calibration of the system, the calibration has to be repeated on every startup.
+Because the phase and amplitude offsets are affected by the automatic calibration of the system,
+this calibration should ideally be repeated on every startup, ideally letting the system temperature stabilize.
+
+An advantage for the offline calibration is that the speed at which the array incoherence grows is limited.
+That means that for sufficiently short runtimes, it can be assumed to be static, and therefor, an offline calibration to be sufficient.

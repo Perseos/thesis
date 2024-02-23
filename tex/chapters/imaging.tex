@@ -3,17 +3,227 @@
 - restate motivation of imaging
 - chapter overview
 
-\section{Implementation}
-- pytorch advantages:
-- parallel processing for tensors
-- API for c++
-- CUDA-capabilities
-- pre-calculating BP weights
-- how to use measured gains
-- increased performance with ifft
+\section{PyTorch}
+The algorithms implemented in this chapter are presented in the PyTorch framework.
+As a machine learning framework, it provides accelerated tensor processing.
+Tensors, ie.\ rectangular multidimensional arrays are a perfect fit to
+describe the signals sent by the sensor and the subsequent signal processing.
 
-\section{Results}
-- side-lobes
-- compare to array gain
-- computational intensity ?
-- azimuth-range and 3D images
+Since a huge part of the operations in the imaging algorithms are parallelizable,
+substantial performance gains can be achieved with the built-in parallel processing
+of tensor operations in PyTorch.
+While parallel processing on a CPU already substantially improves runtimes,
+even better performance can be achieved with GPU-enabled parallel processing,
+which is currently available using the CUDA-API on NVDIA GPUs.
+
+To aid in understanding any code listings in this chapter,
+the next section will briefly discuss some key parts of PyTorch's syntax for tensor processing.
+
+\subsection{Syntax}
+Pytorch Tensors can be created from python lists,
+or with a utility function like \verb|zeros()|, \verb|ones()| or \verb|full()|:
+\lstset{
+    language = Python ,
+    columns = flexible ,
+    escapeinside = {<@}{@>} ,
+    frame = lines ,
+    alsoletter = > ,
+    morekeywords = {>>>} ,
+    style=mystyle
+}
+\begin{lstlisting}
+>>> torch.tensor(list(range(2)))
+tensor([0, 1])
+>>> torch.ones((2,3))
+tensor([[1., 1., 1.],
+        [1., 1., 1.]])
+\end{lstlisting}
+
+Python's basic binary operators, such as \verb|+,-,*| or \verb|/|, can be used to operate on tensors.
+If both tensors are the same size, the operation is done element by element, similar to the hadamard product of matrices.
+Scalars can also be applied to tensors.
+\begin{lstlisting}
+>>> torch.tensor(list(range(2))) + torch.ones(2)
+tensor([1., 2.])
+>>> 5 + torch.zeros(2)
+tensor([5.,5.])
+\end{lstlisting}
+
+These operations are also allowed for tensors of different size, if their shapes follow the requirement:
+``when iterating over the dimension sizes, starting at the trailing dimension,
+the dimension sizes must either be equal, one of them is 1, or one of them does not exist.''\footnote{
+    see \url{https://pytorch.org/docs/stable/notes/broadcasting.html}
+}.
+
+For example, a $3 \times 2\times 1$ tensor and a $1 \times 2$ tensor are broadcastable:
+\begin{lstlisting}
+>>> a = torch.tensor([[[0],[1]],[[2],[3]],[[4],[5]]])
+>>> b = torch.tensor([[1,10]])
+>>> a.shape, b.shape
+(torch.Size([3, 2, 1]), torch.Size([1, 2]))
+>>> a+b
+tensor([[[ 1, 10],
+         [ 2, 11]],
+
+        [[ 3, 12],
+         [ 4, 13]],
+
+        [[ 5, 14],
+         [ 6, 15]]])
+\end{lstlisting}
+In the third dimension, the elements of tensor \verb|a| are broadcast onto the elements of tensor \verb|b|.
+In the second dimension, the inverse is the case. The resulting tensor has the shape $3 \times 2\times 2$.
+
+Tensor indexing is similar to list indexing in python; a tensor is indexed with a tuple of indices or slices.
+For example, to select all first elements of the previous result's third dimension, the following syntax is used:
+\begin{lstlisting}
+>>> c=a+b
+>>> c[:,:,0]
+tensor([[1, 2],
+        [3, 4],
+        [5, 6]])
+\end{lstlisting}
+Dimensions where a single index was used are omitted from the result.
+It is also possible to insert dimensions with the keyword \verb|None|:
+\begin{lstlisting}
+>>> c[:,:,0].shape
+torch.Size([3, 2])
+>>> c[:,None,:,0].shape
+torch.Size([3, 1, 2])
+\end{lstlisting}
+
+Besides these basic operations, a plethora of functions is already implemented for tensors.
+Often, for each function operating on a tensor,
+there is also an equivalent member function of the class tensor that does the same.
+This makes composing functions a lot easier, requiring no nested parantheses:
+\begin{lstlisting}
+>>> a = torch.randn((1,100))
+>>> 20*torch.log10(torch.abs(torch.mean(a)))
+tensor(-16.3953)
+>>> 20*a.mean().abs().log10()
+tensor(-16.3953)
+\end{lstlisting}
+
+\section{FFT-Based Imaging}
+
+The first imaging algorithm to be implemented is based on the FFT.
+A detailed description of the algorithm can be found in section \ref{ssec:dft_imaging_theory},
+but the following is an abrigded summary to reiterate the key principles.
+
+The range is estimated by computing the FFT spectrum of each time signal;
+due to the FMCW principle, the frequency of the received signal is directly related to its range.
+Then, making the assumption of planar incident waves
+as well as having calibrated the array to achieve coherence between channels,
+the angle of arrival can be estimated using FFTs over the ULA subset of the sensor's virtual antenna array.
+The resolution can be increased by zero-padding the signal before applying the FFT.
+An example implementation in PyTorch is shown in code listing \ref{lst:fft_img}.
+
+\lstinputlisting[
+    caption={PyTorch Implementation of the FFT-based imaging algorithm},
+    language=Python,
+    label=lst:fft_img]{../figures/scripts/3.1_imaging/fft_example_impl.py}
+
+The function \verb|calc_image| returns a 3D-image of dimension $N_{range} \times N_{azimuth} \times N_{elevation}$.
+Its input consists of \verb|data|, a time data tensor of dimension $M \times K$,
+the calibration weights \verb|weights| of dimension $K$, and \verb|settings|, a dictionary of settings.
+\verb|settings| is expected to contain the input and output dimensions,
+the indices of the ULA subset of the virtual array with gaps indicated by $-1$,
+as well as the window functions to be used in each FFT.
+
+\subsection{Offline Calibration}
+To compute the angle of arrival, the input signal has to be made coherent in phase.
+This is done by deviding each channel's range spectrum $Y_k(\Omega)$ by the estimate channel gain $\hat C_k e^{j\hat \varphi_k}$.
+As well as aligning the phases correctly, this also equalizes the channel gains. \\
+
+\subsection{Direction of Arrival Accuracy}
+
+This section aims to illustrate the theoretical capabilities of FFT-based DoA-estimation on the iMCR.
+The directivity in azimuth and elevation is simulated for multiple distances to illustrate the impact of near-field conditions.
+Another simulation shows the impact of sub-optimal array calibration. \\
+
+For this, the input time signal is an ideal point source (see eqn.\ \ref{eqn:ideal_scatterer}),
+located at $(R,\theta=0,\phi=0)$
+% , degraded with CSCG\footnote{circularly symmetric complex Gaussian} noise
+% $\underline{\mathbf n} \sim \mathcal{CN}(0, \sigma^2 \mathbf I) $ and 
+assuming a constant antenna gain of $\underline G_k(r,0,0)=1 \,\forall r,k$:
+\begin{align}
+    \underline y_k[m] =  e^{-j\dot \omega \frac{2R}{c_0} m T_s}
+    % + \underline n_k[m]
+    ,\,k\in[0,K-1],m\in[0,M-1]
+\end{align}
+\\
+The image is computed for multiple distances at resolution
+$N_{range} = 1024, N_{azimuth} = 2048$ and $N_{elevation} = 8$.
+and evaluated at the range and evaluation bin of the scatterer.
+The resulting peaks in azimuth are shown in figure \ref{fig:fft_doa_peak}.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth]{../figures/fft_doa_peak.pdf}
+    \caption{iMCR theoretical FFT DoA characteristics for ideal point scatterer at different ranges}
+    \label{fig:fft_doa_peak}
+\end{figure}
+
+The Fraunhofer distance of the array can be computed from the wavelength $\lambda_0=$ \SIlist{3.944}{\mm}
+and the virtual array's azimuth aperture $D = 86 \frac{\lambda_0}{2}=$ \SI{16.96}{\cm}:
+\begin{align}
+    d_f  = \frac{2D^2}{\lambda_0}
+    = \SI{14.59}{\m}
+\end{align}
+It can be seen that for targets closer than $d_f$, the peak deteriorates in multiple ways.
+The location of the peak moves to higher angles than the actual location of $\theta =$ \SI{0}{\degree}.
+For targets at \SI{30}{\cm}, the peak has moved to $\theta =$ \SI{2.02}{\degree}.
+
+In near-field conditions, the side lobe levels increase until their minimum only around \SI{20}{\dB} below the peak,
+whereas in the far field, the minimum is \SI{60}{\dB} below the peak.
+
+In far-field conditions, the main peak at $\theta =$ \SI{0}{\degree}
+is clearly separated from its sidelobes by pronounced local minima.
+The minimum to the right of the main peak starts to disappear below $d_f$,
+and the peak to the right starts to merge with the main peak the closer the target gets.
+The far-field half-power and quarter-power beamwidths are approximately
+$\theta_{\SI{3}{\dB}}=$ \SI{1.9}{\degree} and $\theta_{\SI{6}{\dB}}=$ \SI{2.6}{\degree}, respectively.
+
+- Talk about elevation (sparse, non-ULA)
+
+- Elevation Beampattern
+
+- Conclude
+
+
+\subsection{Result}
+
+- BVD tower image
+
+- maybe 3d image?
+
+- Runtime, real-time capabilities
+
+
+\section{Backprojection Imaging}
+TODO:
+
+- calculate BP weights
+
+- memory limitation: number of weights
+
+- use measured gains
+
+\subsection{Direction of Arrival Accuracy}
+
+- Show Beampattern
+
+\subsection{Result}
+
+
+\section{Hybrid Approach}
+
+- Runtime-Performance Trade-Off
+
+-
+\subsection{Direction of Arrival Accuracy}
+- Phase error due to frequency quantization
+
+- Plot: near-field beampattern for different FFT-lengths
+
+\section{Conclusion}
+

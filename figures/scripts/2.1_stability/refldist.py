@@ -1,8 +1,9 @@
-from timedataparser import load_all
-import tools, torch
+import torch, sys
+sys.path.append('/home/dgotzens/scripts')
 import pdfdefaults as pdf
+import tools
+from timedataparser import load_all
 import matplotlib.pyplot as plt
-import sys
 
 date='23-10-09' if len(sys.argv) <= 1 else sys.argv[1]
 header,time,data,temperature = load_all(f'/home/dgotzens/localstorage/workspace/masterarbeit/recording/{date}/')
@@ -26,6 +27,4 @@ ax.xaxis.set_major_formatter(tools.hhmm)
 ax.set_xlabel('time')
 ax.set_ylabel('distance [mm]')
 ax.grid()
-# f.savefig('../refldist.pdf')
-f.show()
-input()
+f.savefig('/home/dgotzens/thesis/figures/refldist.pdf')

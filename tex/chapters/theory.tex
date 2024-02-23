@@ -3,7 +3,7 @@ This section provides a foundation for understanding the principles and methodol
 We begin by elucidating the signal model employed in FMCW radar systems, elucidating the distinctions between single-channel and MIMO configurations.
 Subsequently, we delve into the intricacies of image reconstruction techniques,
 exploring both the Discrete Fourier Transform (DFT) approach and the proposed backprojection algorithm.
-
+\section{Antenna Fundamentals}
 \section{Signal Model}
 Understanding the signal model is fundamental to grasp the operation and capabilities of FMCW MIMO radar systems.
 In this section, we delve into the intricacies of the signal model,
@@ -59,7 +59,11 @@ a single-channel FMCW-radar can be used to scan in multiple directions,
 by either rotating the antennas, redirecting their beam with rotating mirrors, or with beamforming antenna arrays.
 In any case, this requires highly directive antennas and also increases size, weight and cost of a radar sensor.
 
-\subsection{MIMO FMCW}
+\subsection{Uniform Linear Arrays}
+
+\subsection{Virtual Arrays}
+
+\subsection{Multiplexing Techniques}
 Multiple-input multiple-output radar benefits from increased diversity and signal power.
 If $N_{TX}$ transmit antennas and $N_{TX}$ receive antennas are employed, $K=N_{TX} \cdot N_{RX}$ channels are available.
 To differentiate the signals from each other, a multiplexing technique has to be chosen.
@@ -76,7 +80,6 @@ where all processing can be done at the intermittent frequency range.
 
 Depending on the application, a compromise has to be found between the advantages and drawbacks of each method.
 There are also methods available that combine aspects of these three basic paradigms, such as OFDM and Hadamard-Coding.[citation needed] \\
-
 Once the received signals are demultiplexed, the ideal receive signal for antenna pair $k \in \{0,1,...K-1\}$:
 
 \begin{align}
@@ -114,6 +117,7 @@ has to be estimated from the received signals $y_k[m]$.
 Multiple approaches are available; in the following, three will be presented.
 
 \subsection{Discrete Fourier Transform}
+\label{ssec:dft_imaging_theory}
 The discrete fourier transform can be implemented with high efficiency,
 and many CPUs even include silicone-based implementations [citation needed].
 In this approach, the DFT is applied over three dimensions of the input signal,

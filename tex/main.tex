@@ -1,7 +1,32 @@
 \documentclass{report}
 % \usepackage{biblatex}
-\usepackage{graphicx,subcaption,amsmath,amssymb,svg,hyperref,siunitx, trfsigns}
+\usepackage{graphicx,caption,subcaption,amsmath,amssymb,svg,hyperref,siunitx, trfsigns, listings}
+\sisetup{exponent-product = \cdot}
 
+\definecolor{codegreen}{rgb}{0.2,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codered}{rgb}{0.7,0.2,0.0}
+\definecolor{codeteal}{rgb}{0.0,0.4,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{codeteal},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codered},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2
+}
 \begin{document}
 \include{chapters/abstract}
 
@@ -13,7 +38,7 @@
 \include{chapters/hardware}
 \include{chapters/stability}
 \include{chapters/antennas}
- 
+
 \include{chapters/imaging}
 
 \include{chapters/conclusions}

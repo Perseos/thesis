@@ -1,21 +1,22 @@
-from timedataparser import load_all
-import tools
 import matplotlib.pyplot as plt
-import pdfdefaults as pdf
 import torch
 import sys
+sys.path.append('/home/dgotzens/scripts')
+from timedataparser import load_all
+import tools
+import pdfdefaults as pdf
 
 date='23-10-09' if len(sys.argv) <= 1 else sys.argv[1]
-header,time,data,temperature,reboots = load_all(f'/home/dgotzens/localstorage/workspace/masterarbeit/recording/{date}/', True)
+header,time,data,temperature,reboots = load_all(f'/home/dgotzens/recording/{date}/', True)
 M,K,L = data.shape
 
-pdf.setup()
+#pdf.setup()
 f, ax = plt.subplots(3,sharex=True)
 # f, ax = plt.subplots(2,sharex=True)
 nfft = 2**11
 data = tools.rangedata(data, N=nfft)
 M,K,L = data.shape
-search_idx = torch.tensor([m for m,r in enumerate(tools.ranges(header, nfft)) if 1.4<r<2])
+search_idx = torch.tensor([m for m,r in enumerate(tools.ranges(header, nfft)) if 0.7<r<1.3])
 m_refl = tools.reflidx(data.mean(1),search_idx)
 drift = torch.empty((K,L), dtype=torch.cfloat)
 for k in range(K):
@@ -62,9 +63,8 @@ ax[2].set_xlabel('Time')
 ax[2].xaxis.set_major_formatter(tools.hhmm)
 for k in range(3):
     ax[k].grid()
-    # ax[k].set_rasterized(True)
+    #ax[k].set_rasterized(True)
 f.set_size_inches(pdf.a4_textwidth, pdf.a4_textwidth*1.2)
 print('saving figure...                                    ')
-f.savefig(f'../meas_{date}_phase_drift.pdf')
-# f.show()
-# input('\n[enter]')
+f.savefig(f'/home/dgotzens/thesis/figures/meas_{date}_phase_drift.pdf')
+#plt.show()

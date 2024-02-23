@@ -1,34 +1,36 @@
 \chapter{Hardware Evaluation}
 
+This chapter starts with a brief introduction of the sensor employed in this thesis(sec. \ref{sec:imcr}).
+The system properties and specifications are outlined, and the makeup of the antenna array is described.
+On the basis of this knowledge, the system can be evaluated through a number of experiments.
 
-% In order to achieve high fidelity imaging, any systematic offsets of the radar sensor must be compensated.
-% In this chapter, the systematic errors of the radar are observed and classified.
-% With knowledge of their stability and overall characteristics,
-% the array's antenna gains are measured and the array is calibrated with these results.
+The second part of this chapter (sec. \ref{sec:stability_analysis}) focuses on stability analysis,
+which is conducted through long-term static measurements of a corner reflector.
+By monitoring the radar system's performance over an extended period,
+we aim to assess its stability and reliability in real-world operating conditions.
+The analysis provides insights into any temporal variations or drifts in system parameters,
+enabling proactive measures to mitigate potential sources of error.
 
-% The first part of this chapter (sec. \ref{sec:stability_analysis}) focuses on stability analysis,
-% which is conducted through long-term static measurements of a corner reflector.
-% By monitoring the radar system's performance over an extended period,
-% we aim to assess its stability and reliability in real-world operating conditions.
-% The analysis provides insights into any temporal variations or drifts in system parameters,
-% enabling proactive measures to mitigate potential sources of error.
+The third part of this chapter (sec. \ref{sec:calibration}) focuses on antenna gain measurements using a rotating setup.
+Antenna gain plays a crucial role in radar imaging, affecting the system's sensitivity and resolution.
+By rotating the radar system and precisely measuring the received signals from known targets,
+we can accurately determine the antenna gain across different azimuth angles.
+This measurement process enables the characterization and validation of antenna performance,
+facilitating improved imaging accuracy and consistency. \\
 
-% The second part of this chapter (sec. \ref{sec:calibration}) focuses on antenna gain measurements using a rotating setup.
-% Antenna gain plays a crucial role in radar imaging, affecting the system's sensitivity and resolution.
-% By rotating the radar system and precisely measuring the received signals from known targets,
-% we can accurately determine the antenna gain across different azimuth angles.
-% This measurement process enables the characterization and validation of antenna performance,
-% facilitating improved imaging accuracy and consistency. \\
-
-% Through these procedures, Chapter 2 aims to establish a robust foundation
-% for the subsequent imaging algorithms that are implemented and evaluated in Chapter 3.
-% By ensuring the stability of system parameters and accurately characterizing antenna performance,
-% we strive to enhance the reliability and effectiveness of FMCW MIMO radar imaging for various applications.
+Through these procedures, Chapter 3 aims to establish a robust foundation
+for the subsequent imaging algorithms that are implemented and evaluated in Chapter 4.
+By ensuring the stability of system parameters and accurately characterizing antenna performance,
+we strive to enhance the reliability and effectiveness of FMCW MIMO radar imaging for various applications.
 
 \section{Indurad Multi-Channel Radar}
-
+\label{sec:imcr}
 The sensor employed in this thesis operates on Multiple Input Multiple Output (MIMO) Frequency Modulated Continuous Wave (FMCW) technology,
 showcasing advanced features tailored for precise radar imaging.
+
+- applications
+
+\subsection{Sytem Parameters}
 It offers a range capability of less than 100 meters, extendable up to 800 meters with active beamforming techniques.
 The sensor achieves a remarkable range resolution of 3.8 millimeters, enabling detailed imaging of objects within its detection range.
 
@@ -44,3 +46,22 @@ Furthermore, the sensor's Intermediate Frequency (IF) samplerate is set at 22 me
 providing sufficient bandwidth for accurate signal processing and analysis.
 This combination of advanced features and specifications positions the sensor as a versatile and effective tool for radar imaging tasks in diverse scenarios,
 ranging from automotive safety systems to industrial sensing applications.
+
+- Summarize in tables
+
+- Image of the sensor
+
+- HW: Cascaded TI-AWR2243P, FPGA, embedded linux, processing
+
+\subsection{Virtual Antenna Array}
+
+"As described in section ..., a virtual antenna array ..."
+
+- Antenna Array Drawing
+
+- Virtual Antenna Array Drawing
+
+- Table of measurements
+
+
+
