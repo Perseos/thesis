@@ -3,7 +3,13 @@ This section provides a foundation for understanding the principles and methodol
 We begin by elucidating the signal model employed in FMCW radar systems, elucidating the distinctions between single-channel and MIMO configurations.
 Subsequently, we delve into the intricacies of image reconstruction techniques,
 exploring both the Discrete Fourier Transform (DFT) approach and the proposed backprojection algorithm.
+
+- Window Functions
 \section{Antenna Fundamentals}
+\subsection{Physical Background}
+asdfasdfasdf
+\subsection{Antenna Characteristics}
+asdfasdf
 \section{Signal Model}
 Understanding the signal model is fundamental to grasp the operation and capabilities of FMCW MIMO radar systems.
 In this section, we delve into the intricacies of the signal model,
@@ -108,9 +114,6 @@ the sampled IF-signal can be defined as:
     y_k[m] = y_k(t=mT_s), \text{for}\;m \in \{0,1,..M-1\}
 \end{align}
 
-
-\section{Calibration}
-
 \section{Image Reconstruction}
 Image reconstruction is an inverse problem where the locational reflectivity of the scene $F(\vec r)$
 has to be estimated from the received signals $y_k[m]$.
@@ -191,6 +194,7 @@ For this to work, the scatterer needs to be distant enough for the wavefronts to
 and the virtual array's grid needs to be uniformly spaced with $d=\lambda_0/2$ spacing.
 
 \subsection{Backprojection}
+\label{ssec:bp_imaging_theory}
 Compared to the DFT-based approach, backprojection takes fewer approximations and requirements on the array to work,
 while using a similar amount of computation.
 The approach works by correlating the input signal $y_k[m]$

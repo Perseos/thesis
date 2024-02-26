@@ -16,93 +16,9 @@ While parallel processing on a CPU already substantially improves runtimes,
 even better performance can be achieved with GPU-enabled parallel processing,
 which is currently available using the CUDA-API on NVDIA GPUs.
 
-To aid in understanding any code listings in this chapter,
-the next section will briefly discuss some key parts of PyTorch's syntax for tensor processing.
-
-\subsection{Syntax}
-Pytorch Tensors can be created from python lists,
-or with a utility function like \verb|zeros()|, \verb|ones()| or \verb|full()|:
-\lstset{
-    language = Python ,
-    columns = flexible ,
-    escapeinside = {<@}{@>} ,
-    frame = lines ,
-    alsoletter = > ,
-    morekeywords = {>>>} ,
-    style=mystyle
-}
-\begin{lstlisting}
->>> torch.tensor(list(range(2)))
-tensor([0, 1])
->>> torch.ones((2,3))
-tensor([[1., 1., 1.],
-        [1., 1., 1.]])
-\end{lstlisting}
-
-Python's basic binary operators, such as \verb|+,-,*| or \verb|/|, can be used to operate on tensors.
-If both tensors are the same size, the operation is done element by element, similar to the hadamard product of matrices.
-Scalars can also be applied to tensors.
-\begin{lstlisting}
->>> torch.tensor(list(range(2))) + torch.ones(2)
-tensor([1., 2.])
->>> 5 + torch.zeros(2)
-tensor([5.,5.])
-\end{lstlisting}
-
-These operations are also allowed for tensors of different size, if their shapes follow the requirement:
-``when iterating over the dimension sizes, starting at the trailing dimension,
-the dimension sizes must either be equal, one of them is 1, or one of them does not exist.''\footnote{
-    see \url{https://pytorch.org/docs/stable/notes/broadcasting.html}
-}.
-
-For example, a $3 \times 2\times 1$ tensor and a $1 \times 2$ tensor are broadcastable:
-\begin{lstlisting}
->>> a = torch.tensor([[[0],[1]],[[2],[3]],[[4],[5]]])
->>> b = torch.tensor([[1,10]])
->>> a.shape, b.shape
-(torch.Size([3, 2, 1]), torch.Size([1, 2]))
->>> a+b
-tensor([[[ 1, 10],
-         [ 2, 11]],
-
-        [[ 3, 12],
-         [ 4, 13]],
-
-        [[ 5, 14],
-         [ 6, 15]]])
-\end{lstlisting}
-In the third dimension, the elements of tensor \verb|a| are broadcast onto the elements of tensor \verb|b|.
-In the second dimension, the inverse is the case. The resulting tensor has the shape $3 \times 2\times 2$.
-
-Tensor indexing is similar to list indexing in python; a tensor is indexed with a tuple of indices or slices.
-For example, to select all first elements of the previous result's third dimension, the following syntax is used:
-\begin{lstlisting}
->>> c=a+b
->>> c[:,:,0]
-tensor([[1, 2],
-        [3, 4],
-        [5, 6]])
-\end{lstlisting}
-Dimensions where a single index was used are omitted from the result.
-It is also possible to insert dimensions with the keyword \verb|None|:
-\begin{lstlisting}
->>> c[:,:,0].shape
-torch.Size([3, 2])
->>> c[:,None,:,0].shape
-torch.Size([3, 1, 2])
-\end{lstlisting}
-
-Besides these basic operations, a plethora of functions is already implemented for tensors.
-Often, for each function operating on a tensor,
-there is also an equivalent member function of the class tensor that does the same.
-This makes composing functions a lot easier, requiring no nested parantheses:
-\begin{lstlisting}
->>> a = torch.randn((1,100))
->>> 20*torch.log10(torch.abs(torch.mean(a)))
-tensor(-16.3953)
->>> 20*a.mean().abs().log10()
-tensor(-16.3953)
-\end{lstlisting}
+To aid in understanding any code listings referenced in this chapter,
+refer to a brief tutorial in section \ref{sec:pytorch_tutorial}
+that discusses some key parts of PyTorch's syntax for tensor processing.
 
 \section{FFT-Based Imaging}
 
@@ -118,11 +34,6 @@ the angle of arrival can be estimated using FFTs over the ULA subset of the sens
 The resolution can be increased by zero-padding the signal before applying the FFT.
 An example implementation in PyTorch is shown in code listing \ref{lst:fft_img}.
 
-\lstinputlisting[
-    caption={PyTorch Implementation of the FFT-based imaging algorithm},
-    language=Python,
-    label=lst:fft_img]{../figures/scripts/3.1_imaging/fft_example_impl.py}
-
 The function \verb|calc_image| returns a 3D-image of dimension $N_{range} \times N_{azimuth} \times N_{elevation}$.
 Its input consists of \verb|data|, a time data tensor of dimension $M \times K$,
 the calibration weights \verb|weights| of dimension $K$, and \verb|settings|, a dictionary of settings.
@@ -136,10 +47,10 @@ This is done by deviding each channel's range spectrum $Y_k(\Omega)$ by the esti
 As well as aligning the phases correctly, this also equalizes the channel gains. \\
 
 \subsection{Direction of Arrival Accuracy}
-
+\label{ssec:fft_doa}
 This section aims to illustrate the theoretical capabilities of FFT-based DoA-estimation on the iMCR.
 The directivity in azimuth and elevation is simulated for multiple distances to illustrate the impact of near-field conditions.
-Another simulation shows the impact of sub-optimal array calibration. \\
+\\
 
 For this, the input time signal is an ideal point source (see eqn.\ \ref{eqn:ideal_scatterer}),
 located at $(R,\theta=0,\phi=0)$
@@ -155,18 +66,18 @@ assuming a constant antenna gain of $\underline G_k(r,0,0)=1 \,\forall r,k$:
 The image is computed for multiple distances at resolution
 $N_{range} = 1024, N_{azimuth} = 2048$ and $N_{elevation} = 8$.
 and evaluated at the range and evaluation bin of the scatterer.
-The resulting peaks in azimuth are shown in figure \ref{fig:fft_doa_peak}.
+The resulting peaks in azimuth are shown in figure \ref{fig:fft_azm_peak}.
 \begin{figure}[h]
     \centering
-    \includegraphics[width=\textwidth]{../figures/fft_doa_peak.pdf}
-    \caption{iMCR theoretical FFT DoA characteristics for ideal point scatterer at different ranges}
-    \label{fig:fft_doa_peak}
+    \includegraphics[width=\textwidth]{../figures/fft_azm_peak.pdf}
+    \caption{iMCR FFT direction of arrival estimation: theoretical accuracy in azimuth for an ideal point scatterer at different ranges}
+    \label{fig:fft_azm_peak}
 \end{figure}
 
 The Fraunhofer distance of the array can be computed from the wavelength $\lambda_0=$ \SIlist{3.944}{\mm}
-and the virtual array's azimuth aperture $D = 86 \frac{\lambda_0}{2}=$ \SI{16.96}{\cm}:
+and the virtual array's azimuth aperture $D_{azm} = 86 \frac{\lambda_0}{2}=$ \SI{16.96}{\cm}:
 \begin{align}
-    d_f  = \frac{2D^2}{\lambda_0}
+    d_f  = \frac{2D_{azm}^2}{\lambda_0}
     = \SI{14.59}{\m}
 \end{align}
 It can be seen that for targets closer than $d_f$, the peak deteriorates in multiple ways.
@@ -181,11 +92,86 @@ is clearly separated from its sidelobes by pronounced local minima.
 The minimum to the right of the main peak starts to disappear below $d_f$,
 and the peak to the right starts to merge with the main peak the closer the target gets.
 The far-field half-power and quarter-power beamwidths are approximately
-$\theta_{\SI{3}{\dB}}=$ \SI{1.9}{\degree} and $\theta_{\SI{6}{\dB}}=$ \SI{2.6}{\degree}, respectively.
+$\theta_{\SI{3}{\dB}}=$ \SI{1.9}{\degree} and $\theta_{\SI{6}{\dB}}=$ \SI{2.6}{\degree}, respectively. \\
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth]{../figures/virt_array.pdf}
+    \caption{iMCR virtual antenna array occupancy}
+    \label{fig:virt_array}
+\end{figure}
 
-- Talk about elevation (sparse, non-ULA)
+For direction of arrival estimation in azimuth, the 86-channel ULA subset of the array is well applicable to an FFT-based approach,
+even with its reduced performance in near-field conditions.
+Yet in elevation, such a ULA subset does not exist, as the array is sparse horizontally and vertically (c.f.\ \ref{fig:virt_array}).
 
-- Elevation Beampattern
+To still use the FFT, an approach would be ``backfilling'' the array with zeros
+to obtain a complete uniformly spaced rectangular virtual array.
+The FFT is then computed over the collumns (c.f.\ \ref{fig:virt_array}) of this array,
+each yielding a spectrum that is related to the direction of arrival in elevation.
+
+A disadvantage of this approach is that it can cause substantial spectral leakage.
+Our backfilled array $b[k] $ is mathematically equivalent
+to applying a binary window function $w[k]$ to the ideal rectangular array $a[k]$:
+\begin{align*}
+    b[k]                   & =  w[k] \cdot  a[k]             \\
+    \text{e.g.}\;  b[0..7] & = [b_0, b_1, 0,0,b_2,0,b_3,0 ], \\
+    w[0..7]                & = [1,  1,0,0,1,0,1,0 ],         \\
+    \text{and}\; a[0..7]   & = [a_0,a_1,a_2,\dots,a_7]
+\end{align*}
+
+
+However, this window function causes additional peaks to appear in the spectrum,
+since multiplication in the time domain is equivalent to convolution in the frequency domain:
+\begin{align*}
+    \mathcal{F}\{b[k]\}[n] & = \mathcal{F}\{w[k] \cdot  a[k]   \}[n] \\
+                           & = W[n] * A[n]
+\end{align*}
+In case of the example given above,
+\begin{align*}
+    |W[0..7]| = [4.00,\ 0.77,\ 1.41,\ 1.85,\ 2.00,\ 1.85,\ 1.41,\ 0.77]
+\end{align*}
+
+It would be possible to reduce the spectral leakage with deconvoltion algorithms.
+To show the starting point for these algorithms,
+the unadulterated spectral peak for targets at multiple distances is shown in figure \ref{fig:fft_elv_peak}.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{../figures/fft_elv_peak.pdf}
+    \caption{iMCR FFT-based direction of arrival: theoretical accuracy in elevation for an ideal point scatterer at different ranges and different array subsets}
+    \label{fig:fft_elv_peak}
+\end{figure}
+
+It can be seen that the half-power beamwidth improves the more channels are included in the sub-array:
+for two, three and four active channels, we approximately get
+$\phi_{\SI{3}{\dB}}=$ \SIlist{60;14;12}{\degree}, respectively.
+
+As the peak narrows, the spectrum contains more and more sidelobes.
+For sub-arrays that include three channels, the side peaks are the strongest,
+barely \SI{3}{\dB} less than the main peak. \\
+
+The Fraunhofer distance of the array in elevation can be computed from the wavelength $\lambda_0=$ \SIlist{3.944}{\mm}
+and the virtual array's maximal elevation aperture $D_{elv} = 7 \frac{\lambda_0}{2}=$ \SI{1.38}{\cm}:
+\begin{align}
+    d_f  = \frac{2D_{elv}^2}{\lambda_0}
+    = \SI{9.66}{\cm}
+\end{align}
+The Frauenhofer distance in elevation is smaller than in azimuth by an order of magnitude.
+Thus, all distances considered lie in the far-field,
+and the shape of the peak should not change a lot over distance.
+
+While this holds true for the two-- and three-channel case, if four channels are considered,
+the shape does change with distance.
+
+On the one hand, the location of the main peak moves to higher angles if the range is decreased.
+On the other hand, the first two sidelobes decrease in amplitude,
+while the third ones move towards $\phi=$ \SI{0}{\degree} and increase in amplitude.
+
+TODO:
+
+- Change Code listing
+
+- Mention Taper Functions!!
 
 - Conclude
 
@@ -200,17 +186,85 @@ $\theta_{\SI{3}{\dB}}=$ \SI{1.9}{\degree} and $\theta_{\SI{6}{\dB}}=$ \SI{2.6}{\
 
 
 \section{Backprojection Imaging}
+
+The second imaging algorithm to be implemented is backprojection.
+A detailed description of the algorithm can be found in section \ref{ssec:bp_imaging_theory},
+but the gist of it is the following:
+
+Backprojection works by computing the correlation between the incoming time data
+and the signal of an ideal point scatterer (see eqn. \ref{eqn:ideal_scatterer})
+at an arbitrary set of locations. The signal uses the measured antenna gains at that location.
+Assuming the antenna gains to be static,
+the ideal signals can be pre-computed to be used to generate images for multiple measurements.
+An example implementation in PyTorch is shown in code listing \ref{lst:bp_img}.
+
 TODO:
 
-- calculate BP weights
+- how to calculate BP weights from measured antenna gains
+\\
 
-- memory limitation: number of weights
+A major limitation of the way the backprojection algorithm is currently implemented is its scalability.
+Pre-calculating the weights, while allowing for decent opportunites in decreasing the runtime through parallel processing,
+quickly use a prohibitive amount of memory.
 
-- use measured gains
+If there are $Z$ individual locations, $M$ sample points in time and $K$ channels, then $M \cdot K \cdot Z$ weights need to be computed.
+For example, the weights for a uniformly spaced image with a rather low resolution of  $Z = 100 \cdot 10 \cdot 100 =$ \SI{100}{kilovoxels},
+at $K=192$ and $M=1022$, stored as complex numbers consisting of two \SI{64}{bit} floating point numbers, would require
+\begin{align*}
+      & M \cdot K \cdot Z \cdot 2 \cdot \SI{64}{\bit} \\
+    = & 1022 \cdot 192 \cdot 10^5 \cdot \SI{16}{byte} \\
+    = & \SI{3.14e12}{byte} = \SI{3.14}{\tera\byte}
+\end{align*}
+of memory.
+With the projections of Moore's law [citation needed],
+this amount of memory should be available in consumer-level computers by the year 2050.
+Until then, the memory requirements has to be reduced by re-computing the weights
+and applying them to the input data along an arbitrary dimension.
+For example, recomputing them for every of the sampled time points would reduce
+the memory requirements by a factor of 1022 to only around \SI{3}{\giga\byte}.
 
 \subsection{Direction of Arrival Accuracy}
 
-- Show Beampattern
+To better understand the DoA-estimation capabilities of the algorithm,
+the azimuth and elevation is simulated for multiple distances to illustrate the impact of near-field conditions.
+The same input signal as in section \ref{ssec:fft_doa} is used.
+\\
+
+The image is computed for multiple distances at resolution
+$N_{range} = 1$, ${N_{azimuth} = 512}$ and $N_{elevation} = 1$.
+Naturally, the range of the image is set to the range of the ideal target each time.
+The resulting peaks in azimuth and elevation are shown in figures \ref{fig:bp_azm_peak} and \ref{fig:bp_elv_peak}, respectively.
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{../figures/bp_azm_peak.pdf}
+    \caption{iMCR backprojection direction of arrival estimation: theoretical accuracy in azimuth for an ideal point scatterer at different ranges}
+    \label{fig:bp_azm_peak}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{../figures/bp_elv_peak.pdf}
+    \caption{iMCR backprojection direction of arrival estimation: theoretical accuracy in elevation for an ideal point scatterer at different ranges}
+    \label{fig:bp_elv_peak}
+\end{figure}
+
+In both azimuth and elevation, it can be seen that the peak no longer deteriorates in near-field conditions.
+The peak and most side lobes remain virtually identical across all considered ranges.
+In azimuth, the level of the sidelobes stabilizes at around \SIrange{30}{40}{\dB} below the peak,
+while in elevation, the sidelobe level is merely \SIrange{3}{6}{\dB} below the peak.
+
+In azimuth, the half-power beamwidth is approximately $\theta_{\SI{3}{\dB}}=$ \SI{1.6}{\degree} and
+the quarter-power beamwidth approximately $\theta_{\SI{6}{\dB}}=$ \SI{2.4}{\degree}.
+In elevation, the half-power beamwidth is approximately $\phi_{\SI{3}{\dB}}=$ \SI{20}{\degree} and
+the quarter-power beamwidth approximately $\phi_{\SI{6}{\dB}}=$ \SI{100}{\degree}.
+
+TODO:
+
+- discuss windowing
+
+- discuss elevation/azimuth trade-off: should elevation-channels contribute more?
+
+
 
 \subsection{Result}
 
@@ -218,7 +272,6 @@ TODO:
 \section{Hybrid Approach}
 
 - Runtime-Performance Trade-Off
-
 -
 \subsection{Direction of Arrival Accuracy}
 - Phase error due to frequency quantization

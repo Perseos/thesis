@@ -1,0 +1,132 @@
+\chapter{Code}
+\section{Introduction to PyTorch Sensor Processing}
+\label{sec:pytorch_tutorial}
+Pytorch Tensors can be created from python lists,
+or with a utility function like \verb|zeros()|, \verb|ones()| or \verb|full()|:
+\lstset{
+    language = Python ,
+    columns = flexible ,
+    escapeinside = {<@}{@>} ,
+    frame = lines ,
+    alsoletter = > ,
+    morekeywords = {>>>} ,
+    style=mystyle
+}
+\begin{lstlisting}
+>>> import torch
+>>> torch.tensor(list(range(2)))
+tensor([0, 1])
+>>> torch.ones((2,3))
+tensor([[1., 1., 1.],
+        [1., 1., 1.]])
+\end{lstlisting}
+
+Python's basic binary operators, such as \verb|+,-,*| or \verb|/|, can be used to operate on tensors.
+If both tensors are the same size, the operation is done element by element, similar to the hadamard product of matrices.
+Scalars can also be applied to tensors.
+\begin{lstlisting}
+>>> torch.tensor(list(range(2))) + torch.ones(2)
+tensor([1., 2.])
+>>> 5 + torch.zeros(2)
+tensor([5.,5.])
+\end{lstlisting}
+
+These operations are also allowed for tensors of different size, if their shapes follow the requirement that
+``[...] iterating over the dimension sizes, starting at the trailing dimension,
+the dimension sizes must either be equal, one of them is 1, or one of them does not exist.''\footnote{
+    see \url{https://pytorch.org/docs/stable/notes/broadcasting.html}
+}\newpage
+
+For example, a $3 \times 2\times 1$ tensor and a $1 \times 2$ tensor are broadcastable:
+\begin{lstlisting}
+>>> a = torch.tensor([[[0],[1]],[[2],[3]],[[4],[5]]])
+>>> b = torch.tensor([[1,10]])
+>>> a.shape, b.shape
+(torch.Size([3, 2, 1]), torch.Size([1, 2]))
+>>> a+b
+tensor([[[ 1, 10],
+         [ 2, 11]],
+
+        [[ 3, 12],
+         [ 4, 13]],
+
+        [[ 5, 14],
+         [ 6, 15]]])
+\end{lstlisting}
+In the third dimension, the elements of tensor \verb|a| are broadcast onto the elements of tensor \verb|b|.
+In the second dimension, the inverse is the case. The resulting tensor has the shape $3 \times 2\times 2$.
+
+Tensor indexing of one-dimensional tensors is identical to list indexing in python;
+and multi-dimensional tensors are indexed with a tuple of indices or slices.
+For example, to select all first elements of the previous result's third dimension, the following syntax is used:
+\begin{lstlisting}
+>>> c=a+b
+>>> c[:,:,0]
+tensor([[1, 2],
+        [3, 4],
+        [5, 6]])
+\end{lstlisting}
+Dimensions where a single index was used are omitted from the result.
+It is also possible to insert dimensions with the keyword \verb|None|:
+\begin{lstlisting}
+>>> c[:,:,0].shape
+torch.Size([3, 2])
+>>> c[:,None,:,0].shape
+torch.Size([3, 1, 2])
+\end{lstlisting}
+
+Besides these basic operations, a plethora of functions is already implemented for tensors.
+Often, for each function operating on a tensor,
+there is also an equivalent member function of the class tensor that does the same.
+This makes composing functions a lot easier, because no nested parentheses are required:
+\begin{lstlisting}
+>>> a = torch.randn((1,100))
+>>> 20*torch.log10(torch.abs(torch.mean(a)))
+tensor(-16.3953)
+>>> 20*a.mean().abs().log10()
+tensor(-16.3953)
+\end{lstlisting}
+
+\newpage
+\section{Listings}
+\lstinputlisting[
+    caption={PyTorch implementation of the FFT-based imaging algorithm},
+    language=Python,
+    firstline=3,
+    lastline=26,
+    float,
+    floatplacement=ht,
+    label=lst:fft_img]{../figures/scripts/3.1_imaging/fft_example_impl.py}
+
+\lstinputlisting[
+    caption={PyTorch computation of a normalized FFT spectrum using a window function},
+    language=Python,
+    firstline=28,
+    float,
+    floatplacement=ht,
+    label=lst:window_fft]{../figures/scripts/3.1_imaging/fft_example_impl.py}
+
+\lstinputlisting[
+    caption={PyTorch implementation of the backprojection imaging algorithm},
+    language=Python,
+    firstline=3,
+    lastline=26,
+    float,
+    floatplacement=ht,
+    label=lst:bp_img]{../figures/scripts/3.1_imaging/bp_example_impl.py}
+\lstinputlisting[
+    caption={PyTorch computation of the channel-wise time of flight for a given position},
+    language=Python,
+    firstline=28,
+    lastline=42,
+    float,
+    floatplacement=ht,
+    label=lst:bp_tof]{../figures/scripts/3.1_imaging/bp_example_impl.py}
+\lstinputlisting[
+    caption={PyTorch computation of uniformly spaced sample positions in different coordinate systems},
+    language=Python,
+    firstline=44,
+    float,
+    floatplacement=ht,
+    label=lst:bp_pos]{../figures/scripts/3.1_imaging/bp_example_impl.py}
+\chapter{Additional Experiments}

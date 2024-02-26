@@ -1,6 +1,6 @@
 \documentclass{report}
 % \usepackage{biblatex}
-\usepackage{graphicx,caption,subcaption,amsmath,amssymb,svg,hyperref,siunitx, trfsigns, listings}
+\usepackage{graphicx,caption,subcaption,amsmath,amssymb,svg,hyperref,siunitx,trfsigns,listings,float}
 \sisetup{exponent-product = \cdot}
 
 \definecolor{codegreen}{rgb}{0.2,0.6,0}
@@ -45,7 +45,9 @@
 
 \include{chapters/discussion}
 
+\appendix
+\include{chapters/appendix}
 \listoffigures
-% \listoftables
+\listoftables
 % \makebibliography
 \end{document}
