@@ -176,9 +176,41 @@ TODO:
 - Conclude
 
 
-\subsection{Result}
+\subsection{Test Image}
+\label{ssec:fft_result}
+To give an indication how well the theoretical capabilities of the FFT-based approach translate into real world applications,
+a test scene was recorded. The sensor is placed in front of the old water tower on top of Lousberg, Aachen.
+A reflector is placed slightly off-center at a distance of approximately \SI{6}{\m}.
 
-- BVD tower image
+The target 2D image spans a $24 \times$\SI{15}{\m} area in the horizontal plane,
+with square pixels of edge length \SI{10}{\cm},
+and the sensor located on one of the image's long sides, namely $[x,y] = [0,0]$.
+
+It is constructed by first calculating the polar-coordinate FFT image at a resolution of $N_{range}\times N_{azimuth} = 2048 \times 512$.
+% applying Hann window-functions in both fourier transforms.
+The image can then be extracted from by selecting the appropriate range- and azimuth bins.
+For calibration, previously measured antenna characteristics are used to improve the array's coherence.
+
+Figure \ref{fig:fft_testimg} shows the resulting image with and without calibration.
+\begin{figure}
+    \centering
+    \begin{subfigure}{0.8\textwidth}
+        \includegraphics[width=\textwidth]{../figures/testimg_uncalibrated_fft.pdf}
+        \subcaption{uncalibrated}
+    \end{subfigure}
+    \begin{subfigure}{0.8\textwidth}
+        \includegraphics[width=\textwidth]{../figures/testimg_calibrated_fft.pdf}
+        \subcaption{calibrated}
+    \end{subfigure}
+    \caption{FFT-based image generated from real data}
+    \label{fig:fft_testimg}
+\end{figure}
+Calibration increases output SNR: less noise visible around [0m,7m]. Also reduces peak width in azimuth. Tower outline easier to make out.
+Still fairly broad peaks, esp. in azimuth. CF azimuth theoretical peak: -40dB SLL. Clearer images: decrease dynamic range.
+
+TO DO:
+
+- image for approximate ground truth
 
 - maybe 3d image?
 
@@ -223,6 +255,25 @@ and applying them to the input data along an arbitrary dimension.
 For example, recomputing them for every of the sampled time points would reduce
 the memory requirements by a factor of 1022 to only around \SI{3}{\giga\byte}.
 
+
+\begin{figure}[h]
+    \centering
+    \begin{subfigure}[t]{\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../figures/bp_azm_peak.pdf}
+        \subcaption{azimuth}
+        \label{fig:bp_azm_peak}
+    \end{subfigure}
+
+    \begin{subfigure}[position]{\textwidth}
+        \centering
+        \includegraphics[width=0.8\textwidth]{../figures/bp_elv_peak.pdf}
+        \subcaption{elevation}
+        \label{fig:bp_elv_peak}
+    \end{subfigure}
+
+    \caption{iMCR backprojection direction of arrival estimation: theoretical accuracy for an ideal point scatterer at different ranges}
+\end{figure}
 \subsection{Direction of Arrival Accuracy}
 
 To better understand the DoA-estimation capabilities of the algorithm,
@@ -234,19 +285,7 @@ The image is computed for multiple distances at resolution
 $N_{range} = 1$, ${N_{azimuth} = 512}$ and $N_{elevation} = 1$.
 Naturally, the range of the image is set to the range of the ideal target each time.
 The resulting peaks in azimuth and elevation are shown in figures \ref{fig:bp_azm_peak} and \ref{fig:bp_elv_peak}, respectively.
-\begin{figure}
-    \centering
-    \includegraphics[width=\textwidth]{../figures/bp_azm_peak.pdf}
-    \caption{iMCR backprojection direction of arrival estimation: theoretical accuracy in azimuth for an ideal point scatterer at different ranges}
-    \label{fig:bp_azm_peak}
-\end{figure}
 
-\begin{figure}
-    \centering
-    \includegraphics[width=0.8\textwidth]{../figures/bp_elv_peak.pdf}
-    \caption{iMCR backprojection direction of arrival estimation: theoretical accuracy in elevation for an ideal point scatterer at different ranges}
-    \label{fig:bp_elv_peak}
-\end{figure}
 
 In both azimuth and elevation, it can be seen that the peak no longer deteriorates in near-field conditions.
 The peak and most side lobes remain virtually identical across all considered ranges.
@@ -265,18 +304,76 @@ TODO:
 - discuss elevation/azimuth trade-off: should elevation-channels contribute more?
 
 
+\newpage
+\subsection{Test Image}
+The theoretical capabilities of the backprojection algorithm are again tested for real world applications,
+using the same scene as in section \ref{ssec:fft_result}.
 
-\subsection{Result}
+Once again, the target 2D image spans a $24 \times$\SI{15}{\m} area in the horizontal plane,
+with square pixels of edge length \SI{10}{\cm},
+and the sensor located on one of the image's long sides, namely $[x,y] = [0,0]$m.
+Unlike the FFT-based approach,
+the backprojection algorithm allows for an arbitrary set of sample points,
+so no further transformations are required.\\
+\begin{figure}[t]
+    \centering
+    \begin{subfigure}[t]{0.8\textwidth}
+        \includegraphics[width=\textwidth]{../figures/testimg_uncalibrated_bp.pdf}
+        \subcaption{uncalibrated}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.8\textwidth}
+        \includegraphics[width=\textwidth]{../figures/testimg_calibrated_bp.pdf}
+        \subcaption{calibrated}
+    \end{subfigure}
+    \caption{Backprojection image generated from real data}
+    \label{fig:bp_testimg}
+\end{figure}
+Figure \ref{fig:bp_testimg} shows the resulting image with and without calibration.
+Calibration increases output SNR: less noise visible around [0m,7m].
+Also reduces peak width in azimuth. Tower outline easier to make out.
+Still fairly broad peaks, esp. in azimuth.
+CF azimuth theoretical peak: -40dB SLL. Clearer images: decrease dynamic range.
 
+
+- improve antenna gain model
+
+- use locational calibration for test image
 
 \section{Hybrid Approach}
 
-- Runtime-Performance Trade-Off
--
+Compared to the FFT-based approach, the backprojection algorithm is a lot more computationally intensive,
+taking multiple orders of magnitude longer to compute a single 2D image.
+
+    [maybe: talk about $\mathcal O(MlogN) \ll \mathcal O(MN)$]
+
+As explained in section \ref{ssec:bp_imaging_theory},
+it is possible to replace part of the computation with an FFT,
+taking advantage of the increased speed and lower memory consumption of the FFT-algorithm,
+while sacrificing some accuracy.
+
+An example implementation of the backprojection-FFT-hybrid algorithm can be found in \ref{lst:hybrid_img}.
+Its theoretical performance is investigated in the next section. Afterwards, a test image is computed.
 \subsection{Direction of Arrival Accuracy}
-- Phase error due to frequency quantization
+
+- Discuss Phase error due to frequency quantization
 
 - Plot: near-field beampattern for different FFT-lengths
 
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth]{../figures/hybrid_azm_peak.pdf}
+    \caption{iMCR Backprojection-FFT-Hybrid direction of arrival estimation: theoretical accuracy in azimuth for an ideal point scatterer at spectral resolutions}
+    \label{fig:hybrid_azm_peak}
+\end{figure}
+
+\subsection{Test Image}
+
 \section{Conclusion}
 
+
+% 28.2.: theory
+% 29.2.: stability
+% 1.3.: antennas
+% 2.3.: imaging
+% 3.3.: Conclusion and discussion
+% 4.3.: formatting, printing

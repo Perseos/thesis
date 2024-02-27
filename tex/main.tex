@@ -1,6 +1,6 @@
-\documentclass{report}
+\documentclass[a4paper]{amsbook}
 % \usepackage{biblatex}
-\usepackage{graphicx,caption,subcaption,amsmath,amssymb,svg,hyperref,siunitx,trfsigns,listings,float}
+\usepackage{fancyhdr, graphicx,caption,subcaption,amsmath,amssymb,svg,hyperref,siunitx,trfsigns,listings,float}
 \sisetup{exponent-product = \cdot}
 
 \definecolor{codegreen}{rgb}{0.2,0.6,0}
@@ -27,24 +27,36 @@
     showtabs=false,
     tabsize=2
 }
+
+\setlength{\headheight}{12.0pt}
+
 \begin{document}
 \include{chapters/abstract}
 
 \tableofcontents
+
+% \pagestyle{fancy}
+% % \fancyhead{} % clear all header fields
+% % \fancyhead[RE]{\textbf{Calibration and Image Reconstruction Techniques for FMCW MIMO Radars with Consideration of Antenna Radiation Patterns}}
+% % \fancyhead[LO]{Daniel Gotzens}
+% \fancyhf{}
+% \fancyhead[RE]{\nouppercase{\rightmark}}
+% \fancyhead[LO]{\nouppercase{\leftmark}}
+% \fancyfoot[LE,RO]{\hfill\thepage\hfill}
+% \fancyfoot{} % clear all footer fields
+% \fancyfoot[LE,RO]{\thepage}
+% \fancyfoot[LO,CE]{From: K. Grant}
+% \fancyfoot[CO,RE]{To: Dean A. Smith}
+
 \include{chapters/intro}
-
 \include{chapters/theory}
-
 \include{chapters/hardware}
 \include{chapters/stability}
 \include{chapters/antennas}
-
 \include{chapters/imaging}
-
 \include{chapters/conclusions}
 
 \include{chapters/discussion}
-
 \appendix
 \include{chapters/appendix}
 \listoffigures
