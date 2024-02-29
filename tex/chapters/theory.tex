@@ -1,15 +1,162 @@
 \chapter{Radar Fundamentals: Theoretical Background}
 This section provides a foundation for understanding the principles and methodologies underpinning FMCW MIMO radar imaging.
-We begin by elucidating the signal model employed in FMCW radar systems, elucidating the distinctions between single-channel and MIMO configurations.
+We begin by elucidating the signal model employed in FMCW radar systems, 
+elucidating the distinctions between single-channel and MIMO configurations.
 Subsequently, we delve into the intricacies of image reconstruction techniques,
 exploring both the Discrete Fourier Transform (DFT) approach and the proposed backprojection algorithm.
 
+- Pre-cite: Definitions from Balanis & IEEE Standard Definitions
 - Window Functions
 \section{Antenna Fundamentals}
+
+The fundamental working principle of radars is to transmit an electromagnetic wave,
+receive a reflected version of the same wave, 
+and to estimate the local scenery based on how much the signal has changed between transmission and reception.
+Antennas are the key building block to enable said transmission and reception.
+They determine the directional characteristics of signals,
+influencing radar coverage, resolution, and sensitivity.
+Therefore, a brief overview of both the physical foundation 
+and the technical description of antennas is given in the following.
+
 \subsection{Physical Background}
-asdfasdfasdf
-\subsection{Antenna Characteristics}
-asdfasdf
+ 
+- electromagnetic radiation
+
+
+The space surrounding a transmit antenna is typically divided into three distinct regions,
+based on the antennas maximum overall dimension $D$ and the wavelength $\lambda$ of the propagating wave: 
+\begin{itemize}
+    \item \emph{reactive near-field region}.
+    In this region the interaction between the antenna and its surrounding medium takes place.
+    Energy oscillates between being stored in the electromagnetic field in the medium 
+    and the electrical charge distribution of the antenna.
+    
+    \item \emph{radiating near-field region}.
+    Starting from a distance of $0.62\sqrt{D^3/lambda}$ (or $\frac{\lambda}{2\pi}$ unless $D\gg\lambda$),
+    the field is made up predominantly of radiation fields emitted by the antenna.
+    In this region, the angular distribution of the field depends on the distance of the antenna.
+
+    \item \emph{radiating far-field region}.
+    Above a distance of $d_F = 2D^2/\lambda$,
+    the angular distribution of the field stops depending on the distance of the antenna,
+    rendering them essentially transverse.
+\end{itemize}
+
+The radiating near-- and far-field regions are sometimes called Fresnel region and Frauenhofer region, respectively.
+These terms are based on an optical analogy for antennas focused at infinity.
+
+While notable differences exist among the zones,
+there are no sudden shifts in the field configurations as one transitions between them. 
+
+\subsection{Antenna Parameters}
+In the following, a set of key parameters is defined that are used to describe an antenna's performance.
+They are adapted from the definitions in [IEEE something].
+
+The \emph{radiation pattern} or \emph{antenna pattern} 
+describes the radiation properties of an antenna as a function of spatial coordinates.
+According to [IEEE], ``[the] quantities that are most often used to characterize the radiation from an antenna
+are proportional to or equal to power flux density,
+radiation intensity, directivity, phase, polarization, and field strength.''
+
+For directive antennas, radiation patterns usually form so-called \emph{lobes}, 
+which are the areas between zero crossings of the pattern. 
+The lobe in the direction of maximum gain is called the \emph{major lobe},
+while all others are called \emph{minor lobes}.
+Minor lobes can be further broken down into \emph{side lobes} and \emph{back lobes},
+where the back lobe faces in the exact opposite direction of the main lobe,
+and \emph{side lobes} usually directly next to it.
+[Figure asdf shows a qualitative example of a radiation pattern,
+designating one of each type of lobe].
+
+An important measure of a radiation pattern is its half-power beamwidth (HPBW).
+It corresponds to the angle between the two points 
+in a radiation pattern's main lobe that are exactly half the power (\SI{-3}{\dB})
+below the main lobe's maximum. Other measures include the quarter-power beamwidth
+(\SI{-6}{\dB} from the peak), and the first-null beamwidth (FNBW) which measures the width of the entire main lobe.
+
+The \emph{radiation power density} is derived from electromagnetic field properties,
+namely the time average Poynting vector.
+Assuming time-harmonic electric and magnetic fields with 
+\begin{align}
+    \vec H(\vec r, t) &= \mathfrak{Re}\{\vec \underline{H}(\vec{r}) e^j\omega t\} \text{ and } \\
+    \vec E(\vec r, t) &= \mathfrak{Re}\{\vec \underline{E}(\vec{r}) e^j\omega t\},
+\end{align}
+the time-average Poynting vector becomes
+\begin{align}
+    \vec S_{avg} = \frac{1}{2} \mathfrak{Re}\{ \vec\underline E \times \vec\underline H^* \}.
+\end{align}
+
+Under far-field conditions,
+the ``power radiated from an antenna per unit solid angle'' can be assumed to be independent of distance.
+That motivates defining this quantity as the \emph{radiation intensity}
+It can be expressed in terms of the radial component of the radiation power density:
+\begin{align}
+    U = r^2 \hat e_r \cdot \vec S_{avg},
+\end{align}
+where $\hat e_r$ is the unit vector in radial direction.
+
+An idealized example, often used as a theoretical reference, is the isotropic lossless radiator, 
+which transforms all input power $P_{in}$ into a planar spherical wave propagating out.
+Its radiation power density is simply
+\begin{align}
+    \vec S_{0} = \frac{P_{in}}{4\pi r^2} \hat e_r,
+\end{align}
+making its radiation intensity
+\begin{align}
+    U_{0} = \frac{P_{in}}{4\pi}.
+\end{align}
+
+Another important quantity is called the antenna gain.
+The \emph{absolute gain} refers to the ratio of an antenna's radiation intensity
+to that of the isotropic lossless radiator receiving the same input power:
+\begin{align}
+    G_{abs}(\theta, \phi) = \frac{U(\theta, \phi)}{U_0} = \frac{4\pi}{P_{in}} U(\theta, \phi)
+\end{align} 
+The  \emph{relative gain} refers to the ratio of an antenna's radiation intensity
+to that of another antenna that is not necessarily an isotropic lossless radiator:
+\begin{align}
+    G_{rel}(\theta, \phi) = \frac{U(\theta, \phi)}{U_ref(\theta, \phi)} = \frac{4\pi}{P_{in}} U(\theta, \phi)
+\end{align} 
+A gain pattern $G(\theta, \phi)$ can further be subdivided into its maximum $G$ 
+and a function $c(\theta, \phi)$ called its \emph{normalized gain pattern}:
+\begin{align}
+    G(\theta, \phi) = G \cdot c(\theta, \phi)
+\end{align}
+with 
+\begin{align*}
+    G = \text{max }G, g(\theta, \phi) = \frac{G(\theta, \phi)}{G}, |g| \in [0,1]
+\end{align*}
+
+
+
+\subsection{Antenna Arrays}
+
+The radiation patterns of single antennas are usually rather wide.
+To make it more narrow, the dimensions of the antenna have to be increased [balanis p. 283].
+This can be accomplished by using multiple copies of the same antenna arranged into a structure called an \emph{array}.
+By constructive and destructive interference between the fields generated by the array's elements,
+the arrays resulting radiation pattern can be increased in the desired direction and decreased in all others.
+Beside the radiation pattern of the individual antennas, 
+the geometric makeup of the array is chiefly important to the array's radiation pattern.
+The array's relative gain, expressed with reference to a single array element,
+is called the \emph{array factor}.
+
+An important variant is the \emph{uniform linear array (ULA)} ,
+which consists of $N$
+``identical elements all of identical magnitude and each with a progressive phase''[balanis p. 290 ff.].
+The array factor can be expressed as a function of the direction $\theta$,
+the phase offset between elements $\delta \varphi$, the distance between elements $d$
+and the wavenumber $k=\omega/c$:
+\begin{align}
+    \text{AF} &= \dfrac{\text{sin}\left(\frac{N}{2}\psi\right)}{\text{sin}\left(\frac{1}{2}\psi\right)}
+    \simeq \text{sinc}\left(\frac{N}{2}\psi\right) \text{ for } \psi \ll 1 \\
+    \text{with } \psi &= (kd\text{cos}\theta + \delta\varphi)
+\end{align}
+Note that the array factor has an additional factor of $e^j\psi(N-1)/2$
+if the reference element is not in the center of the array.
+
+Other array configurations include non-uniform linear arrays as well as planar and circular arrays. 
+
 \section{Signal Model}
 Understanding the signal model is fundamental to grasp the operation and capabilities of FMCW MIMO radar systems.
 In this section, we delve into the intricacies of the signal model,
@@ -65,15 +212,12 @@ a single-channel FMCW-radar can be used to scan in multiple directions,
 by either rotating the antennas, redirecting their beam with rotating mirrors, or with beamforming antenna arrays.
 In any case, this requires highly directive antennas and also increases size, weight and cost of a radar sensor.
 
-\subsection{Uniform Linear Arrays}
-
-\subsection{Virtual Arrays}
 
 \subsection{Multiplexing Techniques}
 Multiple-input multiple-output radar benefits from increased diversity and signal power.
-If $N_{TX}$ transmit antennas and $N_{TX}$ receive antennas are employed, $K=N_{TX} \cdot N_{RX}$ channels are available.
+If $N_{TX}$ transmit antennas and $N_{TX}$ receive antennas are employed, $K=N_{TX} \cdot N_{RX}$ different signals can be extracted.
 To differentiate the signals from each other, a multiplexing technique has to be chosen.
-Options include time division multiplex, frequency division multiplex and code division multiplex. \\
+Options include time division multiplex, frequency division multiplex and code division multiplex.
 
 In TDM, multiple access is achieved by the transmit antennas all send one after another,
 while all receive antennas receive simultaneously.
@@ -86,12 +230,38 @@ where all processing can be done at the intermittent frequency range.
 
 Depending on the application, a compromise has to be found between the advantages and drawbacks of each method.
 There are also methods available that combine aspects of these three basic paradigms, such as OFDM and Hadamard-Coding.[citation needed] \\
-Once the received signals are demultiplexed, the ideal receive signal for antenna pair $k \in \{0,1,...K-1\}$:
 
+\subsection{Virtual Antenna Arrays}
+An important concept in analizing MIMO arrays is that of the \emph{virtual antenna array}:
+in a nutshell, the idea is to express the $N_{TX} \times N_{RX}$ MIMO array as an equivalent $1\times K$ SIMO array.
+The procedure to construct the corresponding virtual array for a given MIMO array is as follows:
+
+The transmit antenna associated with channel $k=0$ is placed in the origin of the virtual array's coordinate system.
+Then, $K$ receive antennas are placed such that the displacement between them and the transmit antenna
+is the same as it was between the original MIMO array's corresponds transmit and receive antenna.
+It is possible for virtual antennas to overlap. 
+As we will see later, the input signal under far-field conditions only depends 
+on the relative displacement between the Tx- and Rx-antennas of a channel, and not their absolute positions.
+
+An example MIMO array and its corresponding virtual array can be seen in figures a and b, respectively.
+The numbering convention for channel index $k$ corresponding to transmit antenna $i$ and receive antenna $j$,
+that is also used throughout the thesis is as follows:
 \begin{align}
-    y_k(t) & = G_k(\vec r_S)e^{-j\dot\omega\tau_k(\vec r_S)t} \label{eqn:ideal_scatterer}
+    k = N_{Tx}i + j
 \end{align}
-Note that both the gain and the propagation delay may differ from channel to channel.
+In our example, the virtual transmit antenna with $k=5$ corresponds to $(i,j)=(1,2)$. \\
+
+
+Once the received signals are demultiplexed, the ideal receive signal for antenna pair $k \in \{0,1,...K-1\}$:
+\begin{align}
+    y_k(t) & = C_k(\vec r_S)e^{-j\dot\omega\tau_k(\vec r_S)t} \label{eqn:ideal_scatterer}
+\end{align}
+The factor $C_k(\vec r_S)$ is called \emph{channel gain}
+and summarizes multiple factors multiple factors in
+Friis transmission equation and the radar range equation [balanis p.]. Namely,
+\begin{align}
+    C_k() 
+\end{align}
 
 In reality, the scene can consist of multiple and expansive scatterers,
 that reflect the transmitted signals at different intensities.
@@ -174,19 +344,9 @@ Applying the DFT accross the ULA yields:
 
 The azimuth angle $\theta_S$ can be extracted from the signal supplied by a horizontal ULA.
 Analogously, the elevation angle $\phi_S$ can be obtained with a vertical ULA.
-If a $1\times K$ array is used, where the $K$ receive antennas form a uniformly spaced grid,
-successive DFTs across the rows and columns of this grid yield two dimensions.
-However, the same can be achieved with fewer antennas in a MIMO configuration. \\
+If a $1\times K$ virtual array is used, where the $K$ receive antennas form a uniformly spaced grid,
+successive DFTs across the rows and columns of this grid yield two dimensions. \\
 
-The \textit{virtual array} of a MIMO array is a corresponding SIMO array.
-It has the same number of channels:
-if the original array is $N_{TX} \times N_{RX}$, the virtual array has $1 \times K$ channels, where $K=N_{TX} \cdot N_{RX}$.
-
-The virtual transmit and receive antenna associated with channel $k=0$ are placed in the origin of the virtual array's coordinate system.
-The other receive antennas are then placed such that the displacement between them and the transmit antenna
-is the same as it was between the original MIMO array's corresponds transmit and receive antenna.
-It is possible for virtual antennas to be at the same location.
-\\
 
 Overall, a 3D image in range, azimuth, and elevation is generated
 by calculating the DFT over time, and the DFTs over the rows and columns of the virtual array.
@@ -223,49 +383,49 @@ calculating the inner sum (over $m$) can be rewritten as an inverse discrete fou
     \mathcal{F}_m^{-1} \left\{ y_k[m]\right\}(\Omega=\dot\omega\tau_k(\vec r_S)T_s)
 \end{align}
 
-\subsection{MUSIC}
-The Multiple Signal Classification (MUSIC) algorithm can also be used to estimate the locational reflectivity of a scene.
-It operates on the time-domain fourier transform of the IF-signal, and makes similar far-field approximations as the DFT-based approach.
-The abstract signal model for MUSIC is:
-\begin{align}
-    \mathbf y(t) = \mathbf A \cdot \mathbf s(t) + \mathbf n(t)
-\end{align}
-Here, $\mathbf y,\mathbf n \in \mathbb{C}^{K}$,
-$\mathbf A \in \mathbb{C}^{K \times Z}$, and
-$\mathbf s \in \mathbb{C}^{Z}$.
-$Z$ is the number of voxels in the output image and $K$ the number of receive channels.
-For example, if the output image consist of $X \times Y \times Z$ cuboid voxels, then $Z=X\cdot Y\cdot Z$. \\
-Thus, the support matrix $\mathbf A$ is a linear transform from the locational reflectivity $\mathbf{s}$
-to the expected input signal vector $\mathbf{y}$.
-Each collumn vector $\mathbf a_z$ of the support matrix $\mathbf A$ therefor corresponds to the expected input signal vector caused by a point source. \\
+% \subsection{MUSIC}
+% The Multiple Signal Classification (MUSIC) algorithm can also be used to estimate the locational reflectivity of a scene.
+% It operates on the time-domain fourier transform of the IF-signal, and makes similar far-field approximations as the DFT-based approach.
+% The abstract signal model for MUSIC is:
+% \begin{align}
+%     \mathbf y(t) = \mathbf A \cdot \mathbf s(t) + \mathbf n(t)
+% \end{align}
+% Here, $\mathbf y,\mathbf n \in \mathbb{C}^{K}$,
+% $\mathbf A \in \mathbb{C}^{K \times Z}$, and
+% $\mathbf s \in \mathbb{C}^{Z}$.
+% $Z$ is the number of voxels in the output image and $K$ the number of receive channels.
+% For example, if the output image consist of $X \times Y \times Z$ cuboid voxels, then $Z=X\cdot Y\cdot Z$. \\
+% Thus, the support matrix $\mathbf A$ is a linear transform from the locational reflectivity $\mathbf{s}$
+% to the expected input signal vector $\mathbf{y}$.
+% Each collumn vector $\mathbf a_z$ of the support matrix $\mathbf A$ therefor corresponds to the expected input signal vector caused by a point source. \\
 
-The MUSIC algorithm revolves around the correlation matrix of its input signal $\mathbf{R_{yy}}$.
-Assuming the a stationary scene with zero-mean noise of covariance $\mathbf{C_{nn}}$,
-it follows that
-\begin{align}
-    \mathbf{R_{yy}} & = \text{E}\{\mathbf{yy}^H\}             \\
-                    & =\mathbf{AR_{ss}A}^H + \mathbf{C_{nn}},
-    \text{\,with\,} \mathbf{R_{ss}} := \text{E}\{\mathbf{ss}^H\}
-\end{align}
-Assume that $\mathbf{R_{ss}}$ is nonsingular with rank $q$ and that $\mathbf{A}$ has full rank.
-If $\mathbf{R_{yy}}$ has $p$ eigenvalues, then the smallest $p-q$ of them are all $\sigma^2$,
-and their corresponding eigenvectors -- i.e. the collumns of $\mathbf{C_{nn}}$ -- are all orthogonal to the support vectors $\mathbf a_z$.
+% The MUSIC algorithm revolves around the correlation matrix of its input signal $\mathbf{R_{yy}}$.
+% Assuming the a stationary scene with zero-mean noise of covariance $\mathbf{C_{nn}}$,
+% it follows that
+% \begin{align}
+%     \mathbf{R_{yy}} & = \text{E}\{\mathbf{yy}^H\}             \\
+%                     & =\mathbf{AR_{ss}A}^H + \mathbf{C_{nn}},
+%     \text{\,with\,} \mathbf{R_{ss}} := \text{E}\{\mathbf{ss}^H\}
+% \end{align}
+% Assume that $\mathbf{R_{ss}}$ is nonsingular with rank $q$ and that $\mathbf{A}$ has full rank.
+% If $\mathbf{R_{yy}}$ has $p$ eigenvalues, then the smallest $p-q$ of them are all $\sigma^2$,
+% and their corresponding eigenvectors -- i.e. the collumns of $\mathbf{C_{nn}}$ -- are all orthogonal to the support vectors $\mathbf a_z$.
 
-This property is key to the MUSIC algorithm.
-The metric used to generate an image is the projection of $\mathbf a_z$ onto the $\mathbf{C_{nn}}$.
-Due to their orthogonality, the projection of support vectors corresponding to a signal source will be zero.
-The image intensity at voxel $z$ is thus defined computed as the normalized inverse square magnitude of this projection:
+% This property is key to the MUSIC algorithm.
+% The metric used to generate an image is the projection of $\mathbf a_z$ onto the $\mathbf{C_{nn}}$.
+% Due to their orthogonality, the projection of support vectors corresponding to a signal source will be zero.
+% The image intensity at voxel $z$ is thus defined computed as the normalized inverse square magnitude of this projection:
 
-\begin{align}
-    P_{MUSIC}[z] = \frac{\mathbf{a}_z^H \mathbf{a}_z}{\mathbf{a}_z^H\hat C_{nn}^H\hat C_{nn}\mathbf{a}_z}
-\end{align} \\
+% \begin{align}
+%     P_{MUSIC}[z] = \frac{\mathbf{a}_z^H \mathbf{a}_z}{\mathbf{a}_z^H\hat C_{nn}^H\hat C_{nn}\mathbf{a}_z}
+% \end{align} \\
 
-The input signals are often highly correlated, due to phenomena such as multipath propagation or inter-channel crosstalk.
-This unfortunately means that nonsingularity of $\mathbf{R_{ss}}$ cannot always be guaranteed.
-A preprocessing step is required to ``decorrelate'' the signals and thereby making $\mathbf{R_{ss}}$ singular again.
+% The input signals are often highly correlated, due to phenomena such as multipath propagation or inter-channel crosstalk.
+% This unfortunately means that nonsingularity of $\mathbf{R_{ss}}$ cannot always be guaranteed.
+% A preprocessing step is required to ``decorrelate'' the signals and thereby making $\mathbf{R_{ss}}$ singular again.
 
-While early schemes, such as the ``3/4in plywood'' spacial dither algorithm by Widrow \textit{et al.} [CITE]
-consisted of mechanically moving the receive antenna array orthogonal to the look direction,
-preprocessing can also be done after receiving the signal.
+% While early schemes, such as the ``3/4in plywood'' spacial dither algorithm by Widrow \textit{et al.} [CITE]
+% consisted of mechanically moving the receive antenna array orthogonal to the look direction,
+% preprocessing can also be done after receiving the signal.
 
-Spacial smoothing, as proposed by [CITE], improves the correlation matrix's eigenstructure by
+% Spacial smoothing, as proposed by [CITE], improves the correlation matrix's eigenstructure by
