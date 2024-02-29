@@ -1,6 +1,12 @@
 \documentclass[a4paper]{amsbook}
-% \usepackage{biblatex}
-\usepackage{fancyhdr, graphicx,caption,subcaption,amsmath,amssymb,svg,hyperref,siunitx,trfsigns,listings,float}
+\usepackage[
+    backend=biber,
+    style=ieee,
+    sorting=ynt
+]{biblatex}
+\addbibresource{../references/fundamentals.bib}
+\addbibresource{../references/imaging.bib}
+\usepackage{graphicx,caption,subcaption,amsmath,amssymb,svg,hyperref,siunitx,trfsigns,listings,float}
 \sisetup{exponent-product = \cdot}
 
 \definecolor{codegreen}{rgb}{0.2,0.6,0}
@@ -16,7 +22,7 @@
     numberstyle=\tiny\color{codegray},
     stringstyle=\color{codered},
     basicstyle=\ttfamily\footnotesize,
-    breakatwhitespace=false,
+    breakatwhitespace=false,  
     breaklines=true,
     captionpos=b,
     keepspaces=true,
@@ -26,27 +32,15 @@
     showstringspaces=false,
     showtabs=false,
     tabsize=2
-}
-
+} 
+\numberwithin{figure}{chapter} 
 \setlength{\headheight}{12.0pt}
 
 \begin{document}
 \include{chapters/abstract}
 
+\setcounter{tocdepth}{2}
 \tableofcontents
-
-% \pagestyle{fancy}
-% % \fancyhead{} % clear all header fields
-% % \fancyhead[RE]{\textbf{Calibration and Image Reconstruction Techniques for FMCW MIMO Radars with Consideration of Antenna Radiation Patterns}}
-% % \fancyhead[LO]{Daniel Gotzens}
-% \fancyhf{}
-% \fancyhead[RE]{\nouppercase{\rightmark}}
-% \fancyhead[LO]{\nouppercase{\leftmark}}
-% \fancyfoot[LE,RO]{\hfill\thepage\hfill}
-% \fancyfoot{} % clear all footer fields
-% \fancyfoot[LE,RO]{\thepage}
-% \fancyfoot[LO,CE]{From: K. Grant}
-% \fancyfoot[CO,RE]{To: Dean A. Smith}
 
 \include{chapters/intro}
 \include{chapters/theory}
@@ -58,8 +52,8 @@
 
 \include{chapters/discussion}
 \appendix
+\printbibliography[heading=bibnumbered]
 \include{chapters/appendix}
 \listoffigures
 \listoftables
-% \makebibliography
 \end{document}

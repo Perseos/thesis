@@ -1,101 +1,102 @@
 \chapter{Radar Fundamentals: Theoretical Background}
 This section provides a foundation for understanding the principles and methodologies underpinning FMCW MIMO radar imaging.
-We begin by elucidating the signal model employed in FMCW radar systems, 
+We begin by elucidating the signal model employed in FMCW radar systems,
 elucidating the distinctions between single-channel and MIMO configurations.
 Subsequently, we delve into the intricacies of image reconstruction techniques,
 exploring both the Discrete Fourier Transform (DFT) approach and the proposed backprojection algorithm.
 
-- Pre-cite: Definitions from Balanis & IEEE Standard Definitions
 - Window Functions
 \section{Antenna Fundamentals}
 
 The fundamental working principle of radars is to transmit an electromagnetic wave,
-receive a reflected version of the same wave, 
+receive a reflected version of the same wave,
 and to estimate the local scenery based on how much the signal has changed between transmission and reception.
 Antennas are the key building block to enable said transmission and reception.
 They determine the directional characteristics of signals,
 influencing radar coverage, resolution, and sensitivity.
-Therefore, a brief overview of both the physical foundation 
+Therefore, a brief overview of both the physical foundation
 and the technical description of antennas is given in the following.
 
 \subsection{Physical Background}
- 
+
 - electromagnetic radiation
 
 
 The space surrounding a transmit antenna is typically divided into three distinct regions,
-based on the antennas maximum overall dimension $D$ and the wavelength $\lambda$ of the propagating wave: 
+based on the antennas maximum overall dimension $D$ and the wavelength $\lambda$ of the propagating wave:
 \begin{itemize}
     \item \emph{reactive near-field region}.
-    In this region the interaction between the antenna and its surrounding medium takes place.
-    Energy oscillates between being stored in the electromagnetic field in the medium 
-    and the electrical charge distribution of the antenna.
-    
+          In this region the interaction between the antenna and its surrounding medium takes place.
+          Energy oscillates between being stored in the electromagnetic field in the medium
+          and the electrical charge distribution of the antenna.
+
     \item \emph{radiating near-field region}.
-    Starting from a distance of $0.62\sqrt{D^3/lambda}$ (or $\frac{\lambda}{2\pi}$ unless $D\gg\lambda$),
-    the field is made up predominantly of radiation fields emitted by the antenna.
-    In this region, the angular distribution of the field depends on the distance of the antenna.
+          Starting from a distance of $0.62\sqrt{D^3/lambda}$ (or $\frac{\lambda}{2\pi}$ unless $D\gg\lambda$),
+          the field is made up predominantly of radiation fields emitted by the antenna.
+          In this region, the angular distribution of the field depends on the distance of the antenna.
 
     \item \emph{radiating far-field region}.
-    Above a distance of $d_F = 2D^2/\lambda$,
-    the angular distribution of the field stops depending on the distance of the antenna,
-    rendering them essentially transverse.
+          Above a distance of $d_F = 2D^2/\lambda$,
+          the angular distribution of the field stops depending on the distance of the antenna,
+          rendering them essentially transverse.
 \end{itemize}
 
 The radiating near-- and far-field regions are sometimes called Fresnel region and Frauenhofer region, respectively.
 These terms are based on an optical analogy for antennas focused at infinity.
 
 While notable differences exist among the zones,
-there are no sudden shifts in the field configurations as one transitions between them. 
+there are no sudden shifts in the field configurations as one transitions between them.
 
 \subsection{Antenna Parameters}
 In the following, a set of key parameters is defined that are used to describe an antenna's performance.
-They are adapted from the definitions in [IEEE something].
+They are adapted from the definitions in \cite{ieee_defs} and \cite{balanis}.
+All quotations in this paragraph, unless stated differenty, are from \cite{ieee_defs}.
+The equations and definitions of symbols are adapted from chapter 2 of \cite{balanis}.
 
-The \emph{radiation pattern} or \emph{antenna pattern} 
+The \emph{radiation pattern} or \emph{antenna pattern}
 describes the radiation properties of an antenna as a function of spatial coordinates.
-According to [IEEE], ``[the] quantities that are most often used to characterize the radiation from an antenna
+According to \cite{ieee_defs}, ``[the] quantities that are most often used to characterize the radiation from an antenna
 are proportional to or equal to power flux density,
 radiation intensity, directivity, phase, polarization, and field strength.''
 
-For directive antennas, radiation patterns usually form so-called \emph{lobes}, 
-which are the areas between zero crossings of the pattern. 
+For directive antennas, radiation patterns usually form so-called \emph{lobes},
+which are the areas between zero crossings of the pattern.
 The lobe in the direction of maximum gain is called the \emph{major lobe},
 while all others are called \emph{minor lobes}.
 Minor lobes can be further broken down into \emph{side lobes} and \emph{back lobes},
 where the back lobe faces in the exact opposite direction of the main lobe,
 and \emph{side lobes} usually directly next to it.
-[Figure asdf shows a qualitative example of a radiation pattern,
-designating one of each type of lobe].
+    [Figure asdf shows a qualitative example of a radiation pattern,
+        designating one of each type of lobe].
 
 An important measure of a radiation pattern is its half-power beamwidth (HPBW).
-It corresponds to the angle between the two points 
+It corresponds to the angle between the two points
 in a radiation pattern's main lobe that are exactly half the power (\SI{-3}{\dB})
 below the main lobe's maximum. Other measures include the quarter-power beamwidth
 (\SI{-6}{\dB} from the peak), and the first-null beamwidth (FNBW) which measures the width of the entire main lobe.
 
 The \emph{radiation power density} is derived from electromagnetic field properties,
 namely the time average Poynting vector.
-Assuming time-harmonic electric and magnetic fields with 
+Assuming time-harmonic electric and magnetic fields with
 \begin{align}
-    \vec H(\vec r, t) &= \mathfrak{Re}\{\vec \underline{H}(\vec{r}) e^j\omega t\} \text{ and } \\
-    \vec E(\vec r, t) &= \mathfrak{Re}\{\vec \underline{E}(\vec{r}) e^j\omega t\},
+    \vec H(\vec r, t) & = \mathfrak{Re}\{\vec{\underline{H}}(\vec{r}) e^{j\omega t}\} \text{ and } \\
+    \vec E(\vec r, t) & = \mathfrak{Re}\{\vec{\underline{E}}(\vec{r}) e^{j\omega t}\},
 \end{align}
 the time-average Poynting vector becomes
 \begin{align}
-    \vec S_{avg} = \frac{1}{2} \mathfrak{Re}\{ \vec\underline E \times \vec\underline H^* \}.
+    \vec S_{avg} = \frac{1}{2} \mathfrak{Re}\{ \underline{\vec E} \times \underline{\vec H}^* \}.
 \end{align}
 
 Under far-field conditions,
 the ``power radiated from an antenna per unit solid angle'' can be assumed to be independent of distance.
-That motivates defining this quantity as the \emph{radiation intensity}
+That motivates defining this quantity as the \emph{radiation intensity}.
 It can be expressed in terms of the radial component of the radiation power density:
 \begin{align}
     U = r^2 \hat e_r \cdot \vec S_{avg},
 \end{align}
 where $\hat e_r$ is the unit vector in radial direction.
 
-An idealized example, often used as a theoretical reference, is the isotropic lossless radiator, 
+An idealized example, often used as a theoretical reference, is the isotropic lossless radiator,
 which transforms all input power $P_{in}$ into a planar spherical wave propagating out.
 Its radiation power density is simply
 \begin{align}
@@ -111,51 +112,49 @@ The \emph{absolute gain} refers to the ratio of an antenna's radiation intensity
 to that of the isotropic lossless radiator receiving the same input power:
 \begin{align}
     G_{abs}(\theta, \phi) = \frac{U(\theta, \phi)}{U_0} = \frac{4\pi}{P_{in}} U(\theta, \phi)
-\end{align} 
+\end{align}
 The  \emph{relative gain} refers to the ratio of an antenna's radiation intensity
 to that of another antenna that is not necessarily an isotropic lossless radiator:
 \begin{align}
     G_{rel}(\theta, \phi) = \frac{U(\theta, \phi)}{U_ref(\theta, \phi)} = \frac{4\pi}{P_{in}} U(\theta, \phi)
-\end{align} 
-A gain pattern $G(\theta, \phi)$ can further be subdivided into its maximum $G$ 
+\end{align}
+A gain pattern $G(\theta, \phi)$ can further be subdivided into its maximum $G$
 and a function $c(\theta, \phi)$ called its \emph{normalized gain pattern}:
 \begin{align}
     G(\theta, \phi) = G \cdot c(\theta, \phi)
 \end{align}
-with 
+with
 \begin{align*}
     G = \text{max }G, g(\theta, \phi) = \frac{G(\theta, \phi)}{G}, |g| \in [0,1]
 \end{align*}
 
-
-
 \subsection{Antenna Arrays}
 
 The radiation patterns of single antennas are usually rather wide.
-To make it more narrow, the dimensions of the antenna have to be increased [balanis p. 283].
+To make it more narrow, the dimensions of the antenna have to be increased (see \cite{balanis} p. 283).
 This can be accomplished by using multiple copies of the same antenna arranged into a structure called an \emph{array}.
 By constructive and destructive interference between the fields generated by the array's elements,
 the arrays resulting radiation pattern can be increased in the desired direction and decreased in all others.
-Beside the radiation pattern of the individual antennas, 
+Beside the radiation pattern of the individual antennas,
 the geometric makeup of the array is chiefly important to the array's radiation pattern.
 The array's relative gain, expressed with reference to a single array element,
 is called the \emph{array factor}.
 
 An important variant is the \emph{uniform linear array (ULA)} ,
 which consists of $N$
-``identical elements all of identical magnitude and each with a progressive phase''[balanis p. 290 ff.].
+``identical elements all of identical magnitude and each with a progressive phase'' (see \cite{balanis} pp. 290f.).
 The array factor can be expressed as a function of the direction $\theta$,
-the phase offset between elements $\delta \varphi$, the distance between elements $d$
+the phase offset between elements $\Delta \varphi$, the distance between elements $d$
 and the wavenumber $k=\omega/c$:
 \begin{align}
-    \text{AF} &= \dfrac{\text{sin}\left(\frac{N}{2}\psi\right)}{\text{sin}\left(\frac{1}{2}\psi\right)}
-    \simeq \text{sinc}\left(\frac{N}{2}\psi\right) \text{ for } \psi \ll 1 \\
-    \text{with } \psi &= (kd\text{cos}\theta + \delta\varphi)
+    \text{AF}         & = \dfrac{\text{sin}\left(\frac{N}{2}\psi\right)}{\text{sin}\left(\frac{1}{2}\psi\right)}
+    \simeq N \text{sinc}\left(\frac{N}{2}\psi\right) \text{ for } \psi \ll 1                                     \\
+    \text{with } \psi & = (kd\text{cos}\theta + \delta\varphi)
 \end{align}
-Note that the array factor has an additional factor of $e^j\psi(N-1)/2$
+Note that the array factor has an additional factor of $e^{j\psi(N-1)/2}$
 if the reference element is not in the center of the array.
 
-Other array configurations include non-uniform linear arrays as well as planar and circular arrays. 
+Other array configurations include non-uniform linear arrays as well as planar and circular arrays.
 
 \section{Signal Model}
 Understanding the signal model is fundamental to grasp the operation and capabilities of FMCW MIMO radar systems.
@@ -168,14 +167,13 @@ highlighting the unique characteristics and complexities associated with their s
 
 \subsection{Single Channel FMCW}
 A single channel consists of a transmit antenna and a receive antenna.
-The transmit antenna sends a so-called chirp of duration $T_{chirp}$,
-which is a sinusoid with linearly increasing frequency.
-The signal $x_{TX}(t)$ send by the transmit antenna is reflected by an ideal point scatterer at position $\vec r_S$
+The continuous wave signal $x_{TX}(t)$ send by the transmit antenna
+is reflected by an ideal point scatterer at position $\vec r_S$
 and then received at the receive antenna as $x_{RX}(t)$.
 
-Linear sawtooth frequency modulation is a popular form of high bandwidth FMCW [jankiraman p.20].
+Linear sawtooth frequency modulation is a popular type of high-bandwidth FMCW \cite{jankiraman}.
 The signal's frequency is modualted with a sawtooth of period $T_{chirp}$.
-Within one period, i.e.\ $t \in [0, T_{chirp}]$, 
+Within one period, i.e.\ $t \in [0, T_{chirp}]$,
 the electric signal of amplitude $A_0$\footnote{
     In later sections, it is often assumed without loss of generality that $A_0=1$ to reduce the length of equations.
 } outputted by the transmitter takes the following shape:
@@ -183,53 +181,55 @@ the electric signal of amplitude $A_0$\footnote{
     x_{TX}(t) & = A_0 e^{j(\omega_0t + \frac{1}{2}\dot \omega t^2 + \phi_0)} \label{eqn:x_TX} \\
 \end{align}
 
-After a propagation delay $\tau$, the signal arrives back at the receiver. 
+After a propagation delay $\tau$, the signal arrives back at the receiver.
 The propagation delaycan be calculated using the speed of light $c_0$,
-and the locations of the scatterer, the receive antenna and the transmit antenna $\vec r_S$  $\vec r_{RX}$ and $\vec r_{TX}$:
+and the locations of the scatterer, the receive antenna and the transmit antenna $\vec r_S$,  $\vec r_{RX}$ and $\vec r_{TX}$:
 \begin{align}
     \tau = \frac{\| \vec r_{TX} - \vec r_S \|+\| \vec r_{RX} - \vec r_S \|}{c_0}
 \end{align}
 
-The ratio of receive to transmit power is defined in the Radar Range Equation in [balanis p. 98f.]
+The ratio of receive to transmit power is defined in the Radar Range Equation in \cite{balanis},  p. 98f:
 \begin{align}
-    \frac{P_{Rx}}{P_{Tx}} = \sigma \frac{G_{Tx}(\phi_{Tx}) G_{Rx}(\phi_{Rx})}{4\pi} \left(\frac{\lambda}{4\pi R_1 R_2}\right)^2
+    \frac{P_{Rx}}{P_{Tx}} = \sigma \frac{G_{Tx}(\theta_{Tx}) G_{Rx}(\theta_{Rx})}{4\pi} \left(\frac{\lambda}{4\pi R_1 R_2}\right)^2
 \end{align}
-Here, $G_{Tx}(\phi_{Tx})$ and $G_{Rx}(\phi_{Rx})$ describe the transmit gain and maximum receive gains 
+Here, $G_{Tx}(\theta_{Tx})$ and $G_{Rx}(\theta_{Rx})$ describe the transmit gain and maximum receive gains
 in direction of the target, $\lambda$ is the wavelength, and $R_1$ and $R_2$ are the distances to the scatterer
 from the transmit and receive antenna, respectively.
 From that, the ratio of receive to transmit amplitude,
 which will be referred to as \emph{channel gain}, can be defined as
 \begin{align}
-    C = \sqrt{\frac{P_{Rx}}{P_{Tx}}}.
+    C = \sqrt{\frac{P_{Rx}}{P_{Tx}}}
 \end{align}
 
-\sigma is the \emph{radar cross section (RCS)} of the observed scene,
-a useful quantity when describing radar measurements. 
-It is defined as ``the area intercepting that amount of power which, 
+Here, $\sigma$ represents the \emph{radar cross section (RCS)} of the observed scene,
+a useful quantity when describing radar measurements.
+It is defined as ``the area intercepting that amount of power which,
 when scattered isotropically, produces at the receiver a density
-which is equal to that scattered by the actual target'' [balanis[13]].
+which is equal to that scattered by the actual target'' \cite{balanis_engineering_1989}.
 
-With that, the amplitude at the receiver can be expressed as 
+With that, the amplitude at the receiver can be expressed as
 \begin{align}
-    y_{Rx}(t) = C(\vec r_S) y_{Tx}(t-\tau) = A_0C(\vec r_S) e^{j(\omega_0(t-\tau) + \frac{1}{2}\dot \omega (t-\tau)^2 + \phi_0)}
+    y_{Rx}(t) & = C(\vec r_S) y_{Tx}(t-\tau)                                                                     \\
+              & = A_0C(\vec r_S) e^{j\left(\omega_0(t-\tau) + \frac{1}{2}\dot \omega (t-\tau)^2 + \phi_0\right)}
 \end{align}
 
-The received signal is then mixed with a copy of the transmitted signal (\ref{eqn:x_TX}) and a band-pass filter is applied.
+The received signal is then mixed with a copy of the transmitted signal (\ref{eqn:x_TX})
+and a band-pass filter is applied that removes undesirable frequencies.
 The resulting signal $y(t)$ is called \textit{intermittent frequency} signal.
 \begin{align}
-    y(t) & = \text{LP} \left\{ x_{RX}(t) \cdot x_{TX}(t) \right\}         \\
-         & = \text{LP} \left\{
+    y(t) & = \text{BP} \left\{ x_{RX}(t) \cdot x_{TX}(t) \right\}                        \\
+         & = \text{BP} \left\{
     A_0 e^{j(\omega_0t + \frac{1}{2}\dot \omega t^2) }
     \cdot A_0C(\vec r_S) e^{j(\omega_0(t-\tau) + \frac{1}{2}\dot \omega (t-\tau)^2) }
-    \right\}                                                              \\
+    \right\}                                                                             \\
          & = A_0^2C(\vec r_S)
     e^{j(\frac{1}{2}\dot\omega\tau^2- \omega_0\tau)}
-    \cdot  \text{LP} \left\{
+    \cdot  \text{BP} \left\{
     e^{j(2\omega_0 t + \frac{1}{2}\dot\omega t^2 - \dot\omega\tau t)}
-    \right\}                                                 \\
+    \right\}                                                                             \\
          & \approx C(\vec r_S)e^{-j\omega_0\tau} e^{-j\dot\omega\tau t} \label{eqn:y_IF}
 \end{align}
-From this complex channel gain $\underline C(\vec r_S)$ can be defined:
+From this, the complex channel gain $\underline C(\vec r_S)$ can be defined:
 \begin{align}
     \underline C(\vec r_S) = C(\vec r_S)e^{-j\omega_0\tau} \label{eqn:G}
 \end{align}
@@ -238,7 +238,7 @@ The fact that the IF-signal contains all the information
 explains the main advantage of this technology.
 The carrier frequency can be orders of magnitude higher than the intermittent frequency,
 which drastically reduces the requirements for the subsequent signal processing,
-while retaining the improved resolution due to the smaller wavelenghts of the carrier frequency [jankiraman p. 20].
+while retaining the improved resolution due to the smaller wavelengths of the carrier frequency \cite{jankiraman}.
 
 To locate a target in the cross-range dimensions,
 a single-channel FMCW-radar can be used to scan in multiple directions,
@@ -271,8 +271,8 @@ The procedure to construct the corresponding virtual array for a given MIMO arra
 The transmit antenna associated with channel $k=0$ is placed in the origin of the virtual array's coordinate system.
 Then, $K$ receive antennas are placed such that the displacement between them and the transmit antenna
 is the same as it was between the original MIMO array's corresponds transmit and receive antenna.
-It is possible for virtual antennas to overlap. 
-As we will see later, the input signal under far-field conditions only depends 
+It is possible for virtual antennas to overlap.
+As we will see later, the input signal under far-field conditions only depends
 on the relative displacement between the Tx- and Rx-antennas of a channel, and not their absolute positions.
 
 An example MIMO array and its corresponding virtual array can be seen in figures a and b, respectively.
@@ -286,21 +286,21 @@ In our example, the virtual transmit antenna with $k=5$ corresponds to $(i,j)=(1
 
 Once the received signals are demultiplexed, the ideal receive signal for antenna pair $k \in \{0,1,...K-1\}$:
 \begin{align}
-    y_k(t) & = C_k(\vec r_S)e^{-j\dot\omega\tau_k(\vec r_S)t} \label{eqn:ideal_scatterer}
+    y_k(t) & = \underline C_k e^{-j\dot\omega\tau_k t} \label{eqn:ideal_scatterer}
 \end{align}
 
 In reality, the scene can consist of an arbitrary number of scatterers ($L$),
-that each have their own radar cross section $\sigma_{l,k}, l=0..L-1$
+that each have their own radar cross section $\sigma_{l,k}, l \in \{0,1,...L-1\}$
 \footnote{
     The index $k$ is introduced here to take obstructed visibility into account:
     from the point of view of one channel, two scatterers may be visible simultaneously,
     while from the point of view of another, one might obstruct the other's visiblity.
 }
-Also, interference and electric noise may be present in each channel [jankiraman chapter 4],
+Also, interference and electric noise may be present in each channel (see \cite{jankiraman}, ch. 4),
 which we summarize as $n_k(t)$.
 Thus, the overall IF-signal is:
 \begin{align}
-    y_k(t) & = \sum_{l=0}^{L-1} C_k(\vec r_l; \sigma_{l,k}) e^{-j\dot\omega\tau_k(\vec r)t} + n_k(t) \\
+    y_k(t) & = \sum_{l=0}^{L-1} \underline C_k(\vec r_l; \sigma_{l,k}) e^{-j\dot\omega\tau_k(\vec r)t} + n_k(t)
 \end{align}
 After sampling the signal at sampling intervals $T_s$ such that the sampling frequency $f_s = \frac{1}{T_s}$
 is sufficiently high: ${2f_s > \frac{1}{2\pi}(\omega_0 + \dot \omega T_{chirp})}$, and with $M$ samples such that $MT_s < T_{chirp}$,
@@ -319,12 +319,14 @@ More sophisticated algorithms include MUSIC, ESPRIT and PARAFAC.
 
 In the following, three approaches and their application to
 the problem of image reconstruction for FMCW MIMO radar sensors are discussed.
-The DFT and Backprojection 
+In this thesis, the DFT-- and backprojection based approaches
+are implemented and evaluated for a MIMO radar system.
+The MUSIC algorithm is also briefly introduced to give an indication of its complexity.
 
 \subsection{Discrete Fourier Transform}
 \label{ssec:dft_imaging_theory}
 The DFT is widely used to compute the frequency spectrum of a given discrete time signal.
-A highly efficient implementation of the DFT is the FFT algorithms, which, 
+A highly efficient implementation of the DFT is the FFT algorithms, which,
 for a given data size $n$, reduces the runtime of the regular DFT $\mathcal O(n^2)$ to $\mathcal O(n\text{log}n)$ [cooley tucker].
 
 In this approach, the FFT is applied over three dimensions of the input signal,
@@ -333,8 +335,8 @@ obtaining a discrete output signal in spherical coordinates whose amplitude is a
 For each input channel, the range of a target can be estimated by applying the DFT over time.
 The resulting spectrum's peak corresponds to the target:
 \begin{align}
-    \mathcal{F}_m\{y_k[m]\}(\Omega) & = \sum_{m=0}^{M-1} e^{-j2\pi\frac{m\Omega}{M}} y_k[m]                            \\
-                                    & = C_k(\vec r_S) \delta(\Omega-\dot \omega \tau_k(\vec r_S)T_s) \label{eqn:y_fft}
+    \mathcal{F}_m\{y_k[m]\}(\Omega) & = \sum_{m=0}^{M-1} e^{-j2\pi\frac{m\Omega}{M}} y_k[m]                                       \\
+                                    & = \underline C_k(\vec r_S) \delta(\Omega-\dot \omega \tau_k(\vec r_S)T_s) \label{eqn:y_fft}
 \end{align}
 
 
@@ -347,7 +349,7 @@ reflects the transmitted radar waves with an intensity of $A_S$.
 Then, their runtime across the array is:
 
 \begin{align}
-    \tau_k & =\frac{1}{c_0} \left( \| \vec r_{TX} - \vec r_S \|+\| \vec r_{RX} - \vec r_S \| \right) \\
+    \tau_k & =\frac{1}{c_0} \left( \| \vec r_{TX} - \vec r_S \|+\| \vec r_{RX} - \vec r_S \| \right)
 \end{align}
 
 In far-field conditions, the target is far enough ($r \gg K d$) away for the reflected wavefronts to be planar.
@@ -356,19 +358,19 @@ That means that a first-order approximation for the runtime can be used:
     \tau_k \approx \frac{2r_S + kd\sin\theta_S}{c_0}
 \end{align}
 
-In equation \ref{eqn:G} it can be seen that the channel gain $C_k(\vec r)$
+In equation (\ref{eqn:G}), it can be seen that the channel gain $C_k(\vec r)$
 contains a phase shift depending on the runtime of the waves:
 \begin{align}
-    \underline{C}_k(\vec r) &= C_k(\vec r_S)e^{-j\omega_0\tau_k} \\
-                &= C_k(\vec r)e^{-j\frac{\omega_0}{c_0}(2r_S + kd\sin\theta_S)}
+    \underline{C}_k(\vec r) & = C_k(\vec r_S)e^{-j\omega_0\tau_k}                            \\
+                            & = C_k(\vec r)e^{-j\frac{\omega_0}{c_0}(2r_S + kd\sin\theta_S)}
 \end{align}
 For a uniform array under far-field conditions,
 the complex channel gains can be assumed only differ in phase. That means that
 \begin{align}
-    \underline{C}_k(\vec r) &= C_k(\vec r)e^{-j\frac{\omega_0}{c_0}(2r_S + kd\sin\theta_S)} \\
-                            &= C_k(\vec r)e^{-j\frac{\omega_0}{c_0}2r_S}e^{-j\frac{\omega_0}{c_0}kd\sin\theta_S}
-                            &= C_0(\vec r)e^{-j\frac{\omega_0}{c_0}kd\sin\theta_S}
- \end{align}
+    \underline{C}_k(\vec r) & = C_k(\vec r)e^{-j\frac{\omega_0}{c_0}(2r_S + kd\sin\theta_S)}                      \\
+                            & = C_k(\vec r)e^{-j\frac{\omega_0}{c_0}2r_S}e^{-j\frac{\omega_0}{c_0}kd\sin\theta_S} \\
+                            & = \underline C_0(\vec r)e^{-j\frac{\omega_0}{c_0}kd\sin\theta_S}
+\end{align}
 Therefore, if the FFT is applied accross the ULA, the resulting spectrum is:
 \begin{align}
     \mathcal{F}_k\{y_k[m]\}(\Omega) & = \mathcal{F}_k\{y_0[m]e^{-j \frac{\omega_0}{c_0}kd\sin\theta_S}\}(\Omega)      \\
@@ -392,7 +394,7 @@ Compared to the DFT-based approach, backprojection takes fewer approximations an
 while theoretically using a similar amount of computation.
 The approach works by correlating the input signal $y_k[m]$
 to the theoretical signal $s_k[m, \vec r]$ of an ideal scatterer at different locations.
-The mean correlation of all channels to the theoretical signal is then used as an estimate for the locational reflectivity:
+The mean correlation of all channels to the theoretical signal is then used as an estimate for the locational RCS $\hat F(\vec r)$:
 \begin{align}
     \hat F(\vec r) & = \frac{1}{K} \sum_{k=0}^{K-1} s_k[m, \vec r] \star y_k[m]             \\
                    & = \frac{1}{K}\sum_{k=0}^{K-1}\sum_{m=0}^{M} s_k^\ast[m, \vec r] y_k[m]
@@ -404,6 +406,7 @@ Using the signal model from (\ref*{eqn:ideal_scatterer}) yields:
 \end{align}
 
 To reduce the computational intensity of this algorithm,
+a hybrid approach\cite{realtime_bp} proposes that
 calculating the inner sum (over $m$) can be rewritten as an inverse discrete fourier transform (IDFT):
 
 \begin{align}
@@ -416,9 +419,11 @@ calculating the inner sum (over $m$) can be rewritten as an inverse discrete fou
     \mathcal{F}_m^{-1} \left\{ y_k[m]\right\}(\Omega=\dot\omega\tau_k(\vec r_S)T_s)
 \end{align}
 
+
 \subsection{MUSIC}
-The Multiple Signal Classification (MUSIC) algorithm can also be used to estimate the locational reflectivity of a scene.
-It operates on the time-domain fourier transform of the IF-signal, and makes similar far-field approximations as the DFT-based approach.
+The Multiple Signal Classification (MUSIC) algorithm \cite{music} is also widely used in radar imaging ().
+In our case, it operates on the time-domain fourier transform of the IF-signal,
+and makes similar far-field approximations as the DFT-based approach.
 The abstract signal model for MUSIC is:
 \begin{align}
     \mathbf y(t) = \mathbf A \cdot \mathbf s(t) + \mathbf n(t)
@@ -454,11 +459,51 @@ The image intensity at voxel $z$ is thus defined computed as the normalized inve
 \end{align} \\
 
 The input signals are often highly correlated, due to phenomena such as multipath propagation or inter-channel crosstalk.
-This unfortunately means that nonsingularity of $\mathbf{R_{ss}}$ cannot always be guaranteed.
+This unfortunately means that nonsingularity of $\mathbf{R_{ss}}$ and thereby of  $\mathbf{R_{yy}}$ cannot always be guaranteed.
 A preprocessing step is required to ``decorrelate'' the signals and thereby making $\mathbf{R_{ss}}$ singular again.
 
 While early schemes, such as the ``3/4in plywood'' spacial dither algorithm by Widrow \textit{et al.} [CITE]
 consisted of mechanically moving the receive antenna array orthogonal to the look direction,
-preprocessing can also be done after receiving the signal.
+preprocessing can also be done after receiving the signal. Spacial smoothing, as employed in [CITE], is one such method.
 
-Spacial smoothing, as proposed by [CITE], improves the correlation matrix's eigenstructure by
+Although MUSIC can achieve high fidelity imaging,
+it is also rather computationally intensive.
+For high numbers of channels and/or high image resolutions,
+the computational intensity may become prohibitive for application.
+
+\subsection{Runtime Analysis}
+Suppose $M$ samples are available for the $K$ channels of an $N\times N$ uniform rectangular array.
+The fastest of the three algorithms is the FFT-based algorithm.
+It first applies an FFT to each of the $K=N^2$ channels.
+Then, the azimuth FFT is applied to the each of the $N$ horizontal sub-arrays for each of the $M$ range bins.
+Finally, the elevation FFT is applied to the each of the $N$ vertical sub-arrays for each of the $M$ range bins.
+The resulting image has a resolution of $M \times N \times N$.
+The total runtime comes out to:
+\begin{align}
+    N^2 \mathcal O(M \log M) + 2MN \mathcal O(N \log N) = \mathcal O \left(MN^2\log (MN^2) \right)
+\end{align}
+
+Backprojection's runtime scales linearly with the target resolution of the image.
+If the target image consists of $Z$ different voxels,
+then for each voxel, $M\times K$ weights are calculated, applied to the data and the result is summed up ($(M-1) \times (K-1)$ operations).
+The total runtime is:
+\begin{align}
+    Z \left(\left(\mathcal O(MK) + \mathcal O(MK) + \mathcal O((M-1)(K-1))\right)\right) = \mathcal O(ZMK)
+\end{align}
+It can be improved by the aforementioned hybrid approach:
+For each of the $K$ channels, one $M$-point FFT is calculated,
+and $Z$ weights are applied to the FFT evaluated at the corresponding frequency.
+That brings the total runtime down to:
+\begin{align}
+    K \left( \mathcal O(M \log M) + \mathcal O(Z)\right) = \mathcal O \left(K(Z + M\log M) \right)
+\end{align}
+The runtime of MUSIC is substantially higher.
+For each of the $K$ channels, one $M$-point FFT is calculated.
+After that, for each of the $M$ ranges, a $K\times K$ covariance matrix is computed.
+The singular value decomposition [cite pdf for runtime] of each of these matrices is computed and the noise subspace is extracted.
+The $C$ collums of the support matrix are then projected onto the noise subspace to compute the intensity at that voxel.
+The resulting image has a resolution of $M\times C$, and the total runtime is:
+\begin{align}
+    K \mathcal O ( M \log M) + M ( \mathcal O (K^2) + \mathcal O (K^3) + C \mathcal O(K^2)) \\
+    = \mathcal O \left(K^3M +KMC+KM\log M\right)
+\end{align}
