@@ -172,46 +172,78 @@ The transmit antenna sends a so-called chirp of duration $T_{chirp}$,
 which is a sinusoid with linearly increasing frequency.
 The signal $x_{TX}(t)$ send by the transmit antenna is reflected by an ideal point scatterer at position $\vec r_S$
 and then received at the receive antenna as $x_{RX}(t)$.
-The propagation delay $\tau$ can be calculated using the speed of light $c_0$,
-and the locations of the receive and transmit antennas $\vec r_{RX}$ and $\vec r_{TX}$:
+
+Linear sawtooth frequency modulation is a popular form of high bandwidth FMCW [jankiraman p.20].
+The signal's frequency is modualted with a sawtooth of period $T_{chirp}$.
+Within one period, i.e.\ $t \in [0, T_{chirp}]$, 
+the electric signal of amplitude $A_0$\footnote{
+    In later sections, it is often assumed without loss of generality that $A_0=1$ to reduce the length of equations.
+} outputted by the transmitter takes the following shape:
+\begin{align}
+    x_{TX}(t) & = A_0 e^{j(\omega_0t + \frac{1}{2}\dot \omega t^2 + \phi_0)} \label{eqn:x_TX} \\
+\end{align}
+
+After a propagation delay $\tau$, the signal arrives back at the receiver. 
+The propagation delaycan be calculated using the speed of light $c_0$,
+and the locations of the scatterer, the receive antenna and the transmit antenna $\vec r_S$  $\vec r_{RX}$ and $\vec r_{TX}$:
 \begin{align}
     \tau = \frac{\| \vec r_{TX} - \vec r_S \|+\| \vec r_{RX} - \vec r_S \|}{c_0}
 \end{align}
-Using a complex representation for the in-phase and quadrature components of the signal,
-the transmit and receive signal can be formulated for $t \in [0, T_{chirp}]$:
+
+The ratio of receive to transmit power is defined in the Radar Range Equation in [balanis p. 98f.]
 \begin{align}
-    x_{TX}(t) & = A_0 e^{j(\omega_0t + \frac{1}{2}\dot \omega t^2 + \phi_0)} \label{eqn:x_TX} \\
-    x_{RX}(t) & = A(\vec r_S) x_{TX}(t-\tau)                                 \label{eqn:x_RX} \\
+    \frac{P_{Rx}}{P_{Tx}} = \sigma \frac{G_{Tx}(\phi_{Tx}) G_{Rx}(\phi_{Rx})}{4\pi} \left(\frac{\lambda}{4\pi R_1 R_2}\right)^2
 \end{align}
-The received signal is then mixed with a copy of the transmitted signal (\ref{eqn:x_TX}) and a low-pass filter is applied.
+Here, $G_{Tx}(\phi_{Tx})$ and $G_{Rx}(\phi_{Rx})$ describe the transmit gain and maximum receive gains 
+in direction of the target, $\lambda$ is the wavelength, and $R_1$ and $R_2$ are the distances to the scatterer
+from the transmit and receive antenna, respectively.
+From that, the ratio of receive to transmit amplitude,
+which will be referred to as \emph{channel gain}, can be defined as
+\begin{align}
+    C = \sqrt{\frac{P_{Rx}}{P_{Tx}}}.
+\end{align}
+
+\sigma is the \emph{radar cross section (RCS)} of the observed scene,
+a useful quantity when describing radar measurements. 
+It is defined as ``the area intercepting that amount of power which, 
+when scattered isotropically, produces at the receiver a density
+which is equal to that scattered by the actual target'' [balanis[13]].
+
+With that, the amplitude at the receiver can be expressed as 
+\begin{align}
+    y_{Rx}(t) = C(\vec r_S) y_{Tx}(t-\tau) = A_0C(\vec r_S) e^{j(\omega_0(t-\tau) + \frac{1}{2}\dot \omega (t-\tau)^2 + \phi_0)}
+\end{align}
+
+The received signal is then mixed with a copy of the transmitted signal (\ref{eqn:x_TX}) and a band-pass filter is applied.
 The resulting signal $y(t)$ is called \textit{intermittent frequency} signal.
 \begin{align}
     y(t) & = \text{LP} \left\{ x_{RX}(t) \cdot x_{TX}(t) \right\}         \\
          & = \text{LP} \left\{
     A_0 e^{j(\omega_0t + \frac{1}{2}\dot \omega t^2) }
-    \cdot A(\vec r_S) A_0 e^{j(\omega_0(t-\tau(\vec r)) + \frac{1}{2}\dot \omega (t-\tau(\vec r))^2) }
+    \cdot A_0C(\vec r_S) e^{j(\omega_0(t-\tau) + \frac{1}{2}\dot \omega (t-\tau)^2) }
     \right\}                                                              \\
-         & = A_0^2A(\vec r_S)
-    e^{j(\frac{1}{2}\dot\omega\tau^2(\vec r_S)- \omega_0\tau)}
+         & = A_0^2C(\vec r_S)
+    e^{j(\frac{1}{2}\dot\omega\tau^2- \omega_0\tau)}
     \cdot  \text{LP} \left\{
     e^{j(2\omega_0 t + \frac{1}{2}\dot\omega t^2 - \dot\omega\tau t)}
-    \right\}                                                \label{eqn:G} \\
-         & \approx G(\vec r_S) e^{-j\dot\omega\tau t} \label{eqn:y_IF}
+    \right\}                                                 \\
+         & \approx C(\vec r_S)e^{-j\omega_0\tau} e^{-j\dot\omega\tau t} \label{eqn:y_IF}
+\end{align}
+From this complex channel gain $\underline C(\vec r_S)$ can be defined:
+\begin{align}
+    \underline C(\vec r_S) = C(\vec r_S)e^{-j\omega_0\tau} \label{eqn:G}
 \end{align}
 The fact that the IF-signal contains all the information
 -- i.e. the IF signal's frequency directly corresponds to the target's distance --
 explains the main advantage of this technology.
 The carrier frequency can be orders of magnitude higher than the intermittent frequency,
 which drastically reduces the requirements for the subsequent signal processing,
-while retaining the improved resolution due to the smaller wavelenghts of the carrier frequency.
-
-FIND QUOTE:"GHz resolution for MHz processing"
+while retaining the improved resolution due to the smaller wavelenghts of the carrier frequency [jankiraman p. 20].
 
 To locate a target in the cross-range dimensions,
 a single-channel FMCW-radar can be used to scan in multiple directions,
 by either rotating the antennas, redirecting their beam with rotating mirrors, or with beamforming antenna arrays.
 In any case, this requires highly directive antennas and also increases size, weight and cost of a radar sensor.
-
 
 \subsection{Multiplexing Techniques}
 Multiple-input multiple-output radar benefits from increased diversity and signal power.
@@ -256,28 +288,21 @@ Once the received signals are demultiplexed, the ideal receive signal for antenn
 \begin{align}
     y_k(t) & = C_k(\vec r_S)e^{-j\dot\omega\tau_k(\vec r_S)t} \label{eqn:ideal_scatterer}
 \end{align}
-The factor $C_k(\vec r_S)$ is called \emph{channel gain}
-and summarizes multiple factors multiple factors in
-Friis transmission equation and the radar range equation [balanis p.]. Namely,
-\begin{align}
-    C_k() 
-\end{align}
 
-In reality, the scene can consist of multiple and expansive scatterers,
-that reflect the transmitted signals at different intensities.
-which is summarized as a locational reflectivity $F_k(\vec r)$.
+In reality, the scene can consist of an arbitrary number of scatterers ($L$),
+that each have their own radar cross section $\sigma_{l,k}, l=0..L-1$
 \footnote{
     The index $k$ is introduced here to take obstructed visibility into account:
     from the point of view of one channel, two scatterers may be visible simultaneously,
     while from the point of view of another, one might obstruct the other's visiblity.
 }
-Also, interference and electric noise may be present in each channel,
+Also, interference and electric noise may be present in each channel [jankiraman chapter 4],
 which we summarize as $n_k(t)$.
 Thus, the overall IF-signal is:
 \begin{align}
-    y_k(t) & = \iiint F_k(\vec r)G_k(\vec r) e^{-j\dot\omega\tau_k(\vec r)t} \;d\vec r + n_k(t) \\
+    y_k(t) & = \sum_{l=0}^{L-1} C_k(\vec r_l; \sigma_{l,k}) e^{-j\dot\omega\tau_k(\vec r)t} + n_k(t) \\
 \end{align}
-After sampling the signal at sampling intervals $T_s$ such the sampling frequency $f_s = \frac{1}{T_s}$
+After sampling the signal at sampling intervals $T_s$ such that the sampling frequency $f_s = \frac{1}{T_s}$
 is sufficiently high: ${2f_s > \frac{1}{2\pi}(\omega_0 + \dot \omega T_{chirp})}$, and with $M$ samples such that $MT_s < T_{chirp}$,
 the sampled IF-signal can be defined as:
 \begin{align}
@@ -285,29 +310,40 @@ the sampled IF-signal can be defined as:
 \end{align}
 
 \section{Image Reconstruction}
-Image reconstruction is an inverse problem where the locational reflectivity of the scene $F(\vec r)$
+Image reconstruction is an inverse problem where the position $\vec r$ and RCS of the scatteres $\sigma$
 has to be estimated from the received signals $y_k[m]$.
-Multiple approaches are available; in the following, three will be presented.
+A wide range of approaches is available.
+A common on spectral analysis of the signals enabled by the \emph{discrete Fourier transform (DFT)}.
+More flexibility is provided by backprojection (also known as the inverse Radon transform).
+More sophisticated algorithms include MUSIC, ESPRIT and PARAFAC.
+
+In the following, three approaches and their application to
+the problem of image reconstruction for FMCW MIMO radar sensors are discussed.
+The DFT and Backprojection 
 
 \subsection{Discrete Fourier Transform}
 \label{ssec:dft_imaging_theory}
-The discrete fourier transform can be implemented with high efficiency,
-and many CPUs even include silicone-based implementations [citation needed].
-In this approach, the DFT is applied over three dimensions of the input signal,
+The DFT is widely used to compute the frequency spectrum of a given discrete time signal.
+A highly efficient implementation of the DFT is the FFT algorithms, which, 
+for a given data size $n$, reduces the runtime of the regular DFT $\mathcal O(n^2)$ to $\mathcal O(n\text{log}n)$ [cooley tucker].
+
+In this approach, the FFT is applied over three dimensions of the input signal,
 obtaining a discrete output signal in spherical coordinates whose amplitude is an estimate of the locational reflectivity.
 
 For each input channel, the range of a target can be estimated by applying the DFT over time.
 The resulting spectrum's peak corresponds to the target:
 \begin{align}
     \mathcal{F}_m\{y_k[m]\}(\Omega) & = \sum_{m=0}^{M-1} e^{-j2\pi\frac{m\Omega}{M}} y_k[m]                            \\
-                                    & = G_k(\vec r_S) \delta(\Omega-\dot \omega \tau_k(\vec r_S)T_s) \label{eqn:y_fft}
+                                    & = C_k(\vec r_S) \delta(\Omega-\dot \omega \tau_k(\vec r_S)T_s) \label{eqn:y_fft}
 \end{align}
 
 
 In order to understand how information on the direction of a target can be extracted from the channel data,
-we consider an ideal $1 \times K$ horizontal uniform linear array (\textit{ULA}) where the spacing is exactly $d=\frac{\lambda_0}{2}$, with $\lambda_0 = \frac{c_0}{f_0}$.
+we consider an ideal $1 \times K$ horizontal ULA
+where the spacing is exactly $d=\frac{\lambda_0}{2}$, with $\lambda_0 = \frac{c_0}{f_0}$.
 The antennas are located at $\vec r_{TX}= \vec 0$ and $\vec r_{RX,k}=(kd,0,0)^T$.
-A scatterer located at  $\vec r_S = (r_S\sin\theta_S, r_{S}\cos\theta_S , 0)^T$  reflects the transmitted radar waves with an intensity of $A_S$.
+A scatterer located at  $\vec r_S = (r_S\sin\theta_S, r_{S}\cos\theta_S , 0)^T$
+reflects the transmitted radar waves with an intensity of $A_S$.
 Then, their runtime across the array is:
 
 \begin{align}
@@ -315,27 +351,25 @@ Then, their runtime across the array is:
 \end{align}
 
 In far-field conditions, the target is far enough ($r \gg K d$) away for the reflected wavefronts to be planar.
-That means that the runtime can then be approximated as such:
+That means that a first-order approximation for the runtime can be used:
+\begin{align}
+    \tau_k \approx \frac{2r_S + kd\sin\theta_S}{c_0}
+\end{align}
 
+In equation \ref{eqn:G} it can be seen that the channel gain $C_k(\vec r)$
+contains a phase shift depending on the runtime of the waves:
 \begin{align}
-    \tau_k \approx 2r_S + kd\sin\theta_S
+    \underline{C}_k(\vec r) &= C_k(\vec r_S)e^{-j\omega_0\tau_k} \\
+                &= C_k(\vec r)e^{-j\frac{\omega_0}{c_0}(2r_S + kd\sin\theta_S)}
 \end{align}
-In equation \ref{eqn:G} it can be seen that the locational gain $G(\vec r)$ contains a phase shift depending on the runtime of the waves:
+For a uniform array under far-field conditions,
+the complex channel gains can be assumed only differ in phase. That means that
 \begin{align}
-    G_k(\vec r) & = A_S A_k(\vec r) e^{j(\frac{1}{2}\dot\omega\tau_k^2- \omega_0\tau_k)} \\
-                & \approx A_S A_k(\vec r) e^{-j\omega_0\tau_k}
-\end{align}
-Assuming the attenuation along the path is channel-independent, the signals can all be considered copies of each other:
-\begin{align}
-    y_k(t)             & = A_S A_k(\vec r) e^{-j\omega_0\tau_k} e^{-j\dot\omega\tau_k t}      \\
-                       & = A_S A_k(\vec r) e^{-j \frac{\omega_0}{c_0}(2r_S + kd\sin\theta_S)}
-    e^{-j\frac{\dot\omega}{c_0}(2r_S +  \overbrace{kd\sin\theta_S}^{\text{$\ll 2r_S$}} )t}    \\
-                       & = A_S A_0(\vec r) e^{-j \frac{\omega_0}{c_0}2r_S }
-    e^{-j\frac{\dot\omega}{c_0}2r_St} e^{-j \frac{\omega_0}{c_0}kd\sin\theta_S}               \\
-                       & = y_0(t) e^{-j \frac{\omega_0}{c_0}kd\sin\theta_S}                   \\
-    \Rightarrow y_k[m] & = y_k(t=mT_S) = y_0[m]e^{-j \frac{\omega_0}{c_0}kd\sin\theta_S}
-\end{align}
-Applying the DFT accross the ULA yields:
+    \underline{C}_k(\vec r) &= C_k(\vec r)e^{-j\frac{\omega_0}{c_0}(2r_S + kd\sin\theta_S)} \\
+                            &= C_k(\vec r)e^{-j\frac{\omega_0}{c_0}2r_S}e^{-j\frac{\omega_0}{c_0}kd\sin\theta_S}
+                            &= C_0(\vec r)e^{-j\frac{\omega_0}{c_0}kd\sin\theta_S}
+ \end{align}
+Therefore, if the FFT is applied accross the ULA, the resulting spectrum is:
 \begin{align}
     \mathcal{F}_k\{y_k[m]\}(\Omega) & = \mathcal{F}_k\{y_0[m]e^{-j \frac{\omega_0}{c_0}kd\sin\theta_S}\}(\Omega)      \\
                                     & = y_0[m] \cdot \delta \left(\Omega -\frac{\omega_0}{c_0}(d\sin\theta_S) \right) \\
@@ -344,9 +378,8 @@ Applying the DFT accross the ULA yields:
 
 The azimuth angle $\theta_S$ can be extracted from the signal supplied by a horizontal ULA.
 Analogously, the elevation angle $\phi_S$ can be obtained with a vertical ULA.
-If a $1\times K$ virtual array is used, where the $K$ receive antennas form a uniformly spaced grid,
-successive DFTs across the rows and columns of this grid yield two dimensions. \\
-
+If a $1\times K$ virtual array is used, where the $K$ receive antennas form a \emph{uniform rectangular array (URA)},
+successive DFTs across the rows and columns of this grid yield two dimensions.
 
 Overall, a 3D image in range, azimuth, and elevation is generated
 by calculating the DFT over time, and the DFTs over the rows and columns of the virtual array.
@@ -383,49 +416,49 @@ calculating the inner sum (over $m$) can be rewritten as an inverse discrete fou
     \mathcal{F}_m^{-1} \left\{ y_k[m]\right\}(\Omega=\dot\omega\tau_k(\vec r_S)T_s)
 \end{align}
 
-% \subsection{MUSIC}
-% The Multiple Signal Classification (MUSIC) algorithm can also be used to estimate the locational reflectivity of a scene.
-% It operates on the time-domain fourier transform of the IF-signal, and makes similar far-field approximations as the DFT-based approach.
-% The abstract signal model for MUSIC is:
-% \begin{align}
-%     \mathbf y(t) = \mathbf A \cdot \mathbf s(t) + \mathbf n(t)
-% \end{align}
-% Here, $\mathbf y,\mathbf n \in \mathbb{C}^{K}$,
-% $\mathbf A \in \mathbb{C}^{K \times Z}$, and
-% $\mathbf s \in \mathbb{C}^{Z}$.
-% $Z$ is the number of voxels in the output image and $K$ the number of receive channels.
-% For example, if the output image consist of $X \times Y \times Z$ cuboid voxels, then $Z=X\cdot Y\cdot Z$. \\
-% Thus, the support matrix $\mathbf A$ is a linear transform from the locational reflectivity $\mathbf{s}$
-% to the expected input signal vector $\mathbf{y}$.
-% Each collumn vector $\mathbf a_z$ of the support matrix $\mathbf A$ therefor corresponds to the expected input signal vector caused by a point source. \\
+\subsection{MUSIC}
+The Multiple Signal Classification (MUSIC) algorithm can also be used to estimate the locational reflectivity of a scene.
+It operates on the time-domain fourier transform of the IF-signal, and makes similar far-field approximations as the DFT-based approach.
+The abstract signal model for MUSIC is:
+\begin{align}
+    \mathbf y(t) = \mathbf A \cdot \mathbf s(t) + \mathbf n(t)
+\end{align}
+Here, $\mathbf y,\mathbf n \in \mathbb{C}^{K}$,
+$\mathbf A \in \mathbb{C}^{K \times Z}$, and
+$\mathbf s \in \mathbb{C}^{Z}$.
+$Z$ is the number of voxels in the output image and $K$ the number of receive channels.
+For example, if the output image consist of $X \times Y \times Z$ cuboid voxels, then $Z=X\cdot Y\cdot Z$. \\
+Thus, the support matrix $\mathbf A$ is a linear transform from the locational reflectivity $\mathbf{s}$
+to the expected input signal vector $\mathbf{y}$.
+Each collumn vector $\mathbf a_z$ of the support matrix $\mathbf A$ therefor corresponds to the expected input signal vector caused by a point source. \\
 
-% The MUSIC algorithm revolves around the correlation matrix of its input signal $\mathbf{R_{yy}}$.
-% Assuming the a stationary scene with zero-mean noise of covariance $\mathbf{C_{nn}}$,
-% it follows that
-% \begin{align}
-%     \mathbf{R_{yy}} & = \text{E}\{\mathbf{yy}^H\}             \\
-%                     & =\mathbf{AR_{ss}A}^H + \mathbf{C_{nn}},
-%     \text{\,with\,} \mathbf{R_{ss}} := \text{E}\{\mathbf{ss}^H\}
-% \end{align}
-% Assume that $\mathbf{R_{ss}}$ is nonsingular with rank $q$ and that $\mathbf{A}$ has full rank.
-% If $\mathbf{R_{yy}}$ has $p$ eigenvalues, then the smallest $p-q$ of them are all $\sigma^2$,
-% and their corresponding eigenvectors -- i.e. the collumns of $\mathbf{C_{nn}}$ -- are all orthogonal to the support vectors $\mathbf a_z$.
+The MUSIC algorithm revolves around the correlation matrix of its input signal $\mathbf{R_{yy}}$.
+Assuming the a stationary scene with zero-mean noise of covariance $\mathbf{C_{nn}}$,
+it follows that
+\begin{align}
+    \mathbf{R_{yy}} & = \text{E}\{\mathbf{yy}^H\}             \\
+                    & =\mathbf{AR_{ss}A}^H + \mathbf{C_{nn}},
+    \text{\,with\,} \mathbf{R_{ss}} := \text{E}\{\mathbf{ss}^H\}
+\end{align}
+Assume that $\mathbf{R_{ss}}$ is nonsingular with rank $q$ and that $\mathbf{A}$ has full rank.
+If $\mathbf{R_{yy}}$ has $p$ eigenvalues, then the smallest $p-q$ of them are all $\sigma^2$,
+and their corresponding eigenvectors -- i.e. the collumns of $\mathbf{C_{nn}}$ -- are all orthogonal to the support vectors $\mathbf a_z$.
 
-% This property is key to the MUSIC algorithm.
-% The metric used to generate an image is the projection of $\mathbf a_z$ onto the $\mathbf{C_{nn}}$.
-% Due to their orthogonality, the projection of support vectors corresponding to a signal source will be zero.
-% The image intensity at voxel $z$ is thus defined computed as the normalized inverse square magnitude of this projection:
+This property is key to the MUSIC algorithm.
+The metric used to generate an image is the projection of $\mathbf a_z$ onto the $\mathbf{C_{nn}}$.
+Due to their orthogonality, the projection of support vectors corresponding to a signal source will be zero.
+The image intensity at voxel $z$ is thus defined computed as the normalized inverse square magnitude of this projection:
 
-% \begin{align}
-%     P_{MUSIC}[z] = \frac{\mathbf{a}_z^H \mathbf{a}_z}{\mathbf{a}_z^H\hat C_{nn}^H\hat C_{nn}\mathbf{a}_z}
-% \end{align} \\
+\begin{align}
+    P_{MUSIC}[z] = \frac{\mathbf{a}_z^H \mathbf{a}_z}{\mathbf{a}_z^H\hat C_{nn}^H\hat C_{nn}\mathbf{a}_z}
+\end{align} \\
 
-% The input signals are often highly correlated, due to phenomena such as multipath propagation or inter-channel crosstalk.
-% This unfortunately means that nonsingularity of $\mathbf{R_{ss}}$ cannot always be guaranteed.
-% A preprocessing step is required to ``decorrelate'' the signals and thereby making $\mathbf{R_{ss}}$ singular again.
+The input signals are often highly correlated, due to phenomena such as multipath propagation or inter-channel crosstalk.
+This unfortunately means that nonsingularity of $\mathbf{R_{ss}}$ cannot always be guaranteed.
+A preprocessing step is required to ``decorrelate'' the signals and thereby making $\mathbf{R_{ss}}$ singular again.
 
-% While early schemes, such as the ``3/4in plywood'' spacial dither algorithm by Widrow \textit{et al.} [CITE]
-% consisted of mechanically moving the receive antenna array orthogonal to the look direction,
-% preprocessing can also be done after receiving the signal.
+While early schemes, such as the ``3/4in plywood'' spacial dither algorithm by Widrow \textit{et al.} [CITE]
+consisted of mechanically moving the receive antenna array orthogonal to the look direction,
+preprocessing can also be done after receiving the signal.
 
-% Spacial smoothing, as proposed by [CITE], improves the correlation matrix's eigenstructure by
+Spacial smoothing, as proposed by [CITE], improves the correlation matrix's eigenstructure by
