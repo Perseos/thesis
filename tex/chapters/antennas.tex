@@ -5,77 +5,70 @@
 In this section, the array's antenna gains are measured and then analyzed.
 The measured antenna gains can then directly be employed as weights for the backprojection algorithm,
 resulting in a calibrated array.
-A subset of the extrated paramters can also be employed for offline calibration when using FFT-based imaging
+A subset of the extrated paramters can also be employed for offline calibration when using FFT-based imaging.
 
-\subsection{Setup}
+\subsection{Experiment Setup}
 TODO: include photo
-
-To measure the antenna gains locationally, the sensor is mounted on a vertical rotating axis.
-Rotating the axis allows a corner reflector to be observed from multiple angles, while retaining a fixed distance.
-Doing this measures the antenna gain in azimuth;
-to measure the antenna gain in elevation, the sensor is mounted on the same axis to rotate around its horizontal axis.
+The experiment conducted to measure the array's antenna gain patterns was conducted outdoors.
+This is preferable because the experiment requires more physical space than the previous stability analysis, 
+and of course minimal interfering clutter in that space.
+The sensor is mounted on a vertical rotating axis, and a corner reflector is placed in front of the sensor.
+Rotating the axis allows the sensor to observe the corner reflector from multiple angles, while retaining a fixed distance.
+Doing this can be used to measure the antenna gains in azimuth;
+to measure the antenna gains in elevation, the sensor is mounted on the same axis to rotate around its horizontal axis.
 These two measurements are repeated for multiple reflector distances.
 
 While the relative position of the rotating axis can be recorded with a decent resolution of around \SI{0.01}{\degree},
 the absolute positioning of the reflector is hard to achieve with the same accuracy.
-The sensor itself can however be used to improve positioning:
-during setup, the phase of the peak caused by the reflector is displayed.
-Mimimizing the phase differences between the array's channels ensures that the reflector be located at boresight.
+The sensor itself can however be used to improve positioning accuracy:
+during setup, the phase of the peak caused by the reflector
+is extracted with a similar method as in section \ref{sec:stability_analysis} and displayed.
+Mimimizing the phase differences between the array's channels by fine-tuning the reflector's position
+ensures that it be located at boresight.
 These measurements are repeated with multiple distances of the relector.\\
 
-The measurements are conducted outdoors to make room for longer distance measurements.
-This however means that the recorded scene is not free of interference.
-
+The field on which the experiment was set up is widely void of clutter, but not entirely.
 Several trees and brushes are located at the edge of the scene.
 Extra interference and reflections are caused by the floor.
 It is also not perfectly level, varying in height by up to \SI{1}{\meter},
 which means that the reflector is not always exactly at the same height.
 The sensor mount also causes some problems [NEEDS DRAWING]:
 when the sensor is mounted on its inside,
-the rotational axis passes exactly through the antenna plane,
+the rotational axis passes exactly through the antenna array's plane,
 but some shading is occurs when the reflector is on the same side as the sensor mount's diagonal reinforcement.
 When the sensor is mounted on the outside,
-the rotational axis is no longer in the antenna plane,
+the rotational axis is no longer in the antenna array's plane,
 adding complexity and inaccuracy to the subsequent analysis.
 
 \subsection{Preprocessing and Analysis}
-
-TODO: Redo Signal Model with Antenna Gains and $k$ as multi-index
+The objective of the subsequent analysis is to extract the antenna gains from the measured IF-signals.
+In section \ref{ssec:single_channel_fmcw}, 
+the the ideal deramped signal $y_{kl}[m]$ from channel $k$ at long-time index $l$
+for a single reflector at position $\vec r_l$
+is defined in equation (\ref{eqn:channel_gain}) :
 \begin{align*}
-    G(r,\theta,\phi) & = \frac{1}{r^2}Ce^{j\varphi} c(\theta,\phi) \\
-    Ce^{j\varphi}    & =Ae^{j\psi}\cdot Be^{j\vartheta}
+    y_{kl}[m] =  C_k(\vec r_l)e^{-j\omega_0\tau_{kl}}e^{-j\dot\omega\tau_{kl}mT_s}
+\end{align*}
+The square of the channel gain directly relates to the antenna gains $A_i$ and $B_j$ 
+of the transmit antenna with index $i$ and the receive antenna with index $j$ that make up the channel:
+\begin{align*}
+    C_k^2 = \frac{P_{Rx}}{P_{Tx}} 
+    =  A_i B_j \frac{\sigma}{4\pi} \left(\frac{\lambda}{4\pi R_1 R_2}\right)^2
 \end{align*}
 
-The expected behavior is formulated in the signal model (see equation \ref{eqn:y_IF}ff.):
 
-\begin{align}
-    y_k(t=mT_s)                & =                  G_k(\vec r) e^{-j\dot\omega\tau_k mT_s},                 \\
-    \text{where}\; G_k(\vec r) & = \frac{A_kA_S(\theta_S,\phi_S)}{R_{k}^2}  e^{-j\omega_0\tau_k + \varphi_k} \\
-    \text{and}\;A_k :          & = A_{Tx,i} \cdot A_{Rx,j} \;\text{for}\;k=N_{Tx}i+j
-\end{align}
-
-A constant channel gain $A_k$, resulting from the transmitting and receiving antenna gains,
-is attenuated with increasing distance, with $|G_k| \propto \frac{1}{R_{k}^2}$.
-The effect of the angle of arrival on the gain is represented by the factor $A_S(\theta_S,\phi_S)$,
-which is normalized such that $A_S(\theta_S,\phi_S) \in [0,1]$.
-A constant channel phase offset $\varphi_k$ is set back proportionally to the time of flight $\tau_k = 2R_k/c$. \\
 
 The goal of the subsequent analysis is twofold:
 to extract all parameters of the above signal model while identifying and removing interference through processing.
 
 Limiting the analysis to a single range bin will work towards both reducing interference and extracting parameters:
 ideally, the DFT spectrum of the IF signal consists of just a single peak,
-weighted with the locational gain $G_k(\vec r)$ (see eqn. \ref{eqn:y_fft}).
-Thus, the parameters of the locational gain can be extracted if the correct bin $\hat \Omega$ is picked:
+weighted with the channel gain $C_k(\vec r)$ (see eqn. \ref{eqn:y_fft}).
+Thus, the channel gain can be extracted if the correct bin $\hat \Omega$ is picked:
 \begin{align}
     \hat \Omega                                               & = \dot \omega \tau_k(\vec r_S)T_s    \\
-                                                              & = \dot \omega \frac{2R_k}{c}T_s      \\
-    \Rightarrow \mathcal{F}_m\{y_k[m]\}(\Omega = \hat \Omega) & =    G_k(\vec r_S) \label{eqn:G_fft}
-\end{align}
-
-The relation between a range bin $\Omega$ and its corresponding range $r$ is
-\begin{align}
-    \Omega = r \cdot \frac{4N_{fft}\dot\omega}{c_0f_s}
+                                                              & = \dot \omega \frac{R_1+R_2}{c}T_s      \\
+    \Rightarrow \mathcal{F}_m\{y_k[m]\}(\Omega = \hat \Omega) & =    \underline C_k(\vec r_S) \label{eqn:G_fft}
 \end{align}
 
 \subsection{Range Estimation}
@@ -89,7 +82,8 @@ The relation between a range bin $\Omega$ and its corresponding range $r$ is
 \end{figure}
 
 In order to improve the accuracy of the subsequent analysis, the exact position of the reflector is estimated from the radar data.
-To do this, numerical optimization is employed to find the parameter set $\hat R_s, \hat \theta_s, \hat \epsilon$ that minimizes the difference between
+To do this, numerical optimization is employed to find the parameter set 
+$\hat R_s, \hat \theta_s, \hat \epsilon$ that minimizes the difference between
 a range estimate $\hat R_{k,l}$ and the range spectral peak $R_{k,l}$ for all channels $k$ and recorded orientations $l$:
 \begin{align}
     R_{k,l} = \text{arg } \underset{r}{\text{max}}\mathcal{F}_m\{y_{k,l}[m]\}\left(\Omega = \frac{N_{fft}r}{R_{max}}\right)
@@ -123,7 +117,6 @@ For a given rotation angle $\phi_l$, it is located at
 In our setup, a signal is recorded with $\theta$ (or $\phi$, respectively) from \SIrange{0}{180}{\degree},
 with the reflector located at roughly $R_S = \{2,8,18,32\}\si{\meter}$ and either $\theta_S = \SI{90}{\degree}$ or $\phi_S = \SI{90}{\degree}$. \\
 
-
 With this, the loss $\mathcal L$ can be defined as the mean square difference between $\hat R$ and $R_{p}$,
 the mean being computed as the average over all $K$ channels and $L$ sensor rotations:
 \begin{align}
@@ -136,10 +129,10 @@ comparing the measured spectral peaks (shown as points) to the estimated positio
 Only a subset of orientations is used for the estimate,
 namely \SI{-50}{\degree} $<\theta_l-$\SI{90}{\degree}$<$ \SI{20}{\degree}. \\
 
-
 For the first three measurements, the peak location oscillates around the estimate by \SIrange[range-units=single]{1}{2}{\cm}.
 The root mean square error is reduced to \SI{11}{\mm}
-The fourth measurement has higher noise, with no clear line being visible in the spectral peaks.
+Due to the decreasing signal level received from higher distances, 
+the fourth measurement has a higher relative noise level, resulting higher movement of the spectral peaks.
 
 \subsection{Amplitude}
 \label{ssec:amplitude}
