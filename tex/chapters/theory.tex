@@ -230,8 +230,8 @@ The resulting signal $y(t)$ is called \textit{intermittent frequency} signal.
          & \approx C(\vec r_S)e^{-j\omega_0\tau} e^{-j\dot\omega\tau t} \label{eqn:y_IF}
 \end{align}
 From this, the complex channel gain\footnote{
-A way to interpret the complex channel gain is through S-parameters of a two-port network,
-since it relates the incident power wave at the transmit antenna's port to the outgoing power wave at the receiver.
+    A way to interpret the complex channel gain is through S-parameters of a two-port network,
+    since it relates the incident power wave at the transmit antenna's port to the outgoing power wave at the receiver.
 } $\underline C(\vec r_S)$ can be defined:
 \begin{align}
     \underline C(\vec r_S) = C(\vec r_S)e^{-j\omega_0\tau} \label{eqn:G}
@@ -312,7 +312,7 @@ the sampled IF-signal can be defined as:
 Since usually many successive chirps are transmitted and received,
 another index $l$ can be added to identify the chirp (i.e.\ $y_{k}[m;l]$)
 In the data cube terminology that is primarily used for doppler radar,
-the sample index $m$ regarding the time offset within a single chirp 
+the sample index $m$ regarding the time offset within a single chirp
 is referred to as the \emph{short time} dimension,
 whereas the sample index $l$ regarding time offset between chirps
 is known as the \emph{long time} dimension \parencite[see][pp. 290f.]{richards}.
@@ -339,7 +339,7 @@ The DFT spectrum $Y[n]$ of a discrete signal $y[m]$ is computed as follows:
 \begin{align}
     Y[n] = \sum_{m=0}^{M-1}y[m]e^{-j\frac{2\pi n}{N}m}
 \end{align}
-An alternative formulation computes a continuous spectrum $Y(\Omega)$ 
+An alternative formulation computes a continuous spectrum $Y(\Omega)$
 from the discrete input signal:
 \begin{align}
     Y(\Omega) = \sum_{m=0}^{M-1}y[m]e^{-j\Omega m}, \Omega \in [-\pi, \pi]

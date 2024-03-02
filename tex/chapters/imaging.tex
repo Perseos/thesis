@@ -34,7 +34,7 @@ the angle of arrival can be estimated using FFTs over the ULA subset of the sens
 The resolution can be increased by zero-padding the signal before applying the FFT.
 An example implementation in PyTorch is shown in code listing \ref{lst:fft_img}.
 
-The function \verb|calc_image| returns a 3D-image of dimension $N_{range} \times N_{azimuth} \times N_{elevation}$.
+Here, the function \verb|calc_image| returns a 3D-image of dimension $N_{range} \times N_{azimuth} \times N_{elevation}$.
 Its input consists of \verb|data|, a time data tensor of dimension $M \times K$,
 the calibration weights \verb|weights| of dimension $K$, and \verb|settings|, a dictionary of settings.
 \verb|settings| is expected to contain the input and output dimensions,
@@ -317,11 +317,11 @@ the backprojection algorithm allows for an arbitrary set of sample points,
 so no further transformations are required.\\
 \begin{figure}[t]
     \centering
-    \begin{subfigure}[t]{0.8\textwidth}
+    \begin{subfigure}{0.8\textwidth}
         \includegraphics[width=\textwidth]{../figures/testimg_uncalibrated_bp.pdf}
         \subcaption{uncalibrated}
     \end{subfigure}
-    \begin{subfigure}[t]{0.8\textwidth}
+    \begin{subfigure}{0.8\textwidth}
         \includegraphics[width=\textwidth]{../figures/testimg_calibrated_bp.pdf}
         \subcaption{calibrated}
     \end{subfigure}
@@ -367,6 +367,19 @@ Its theoretical performance is investigated in the next section. Afterwards, a t
 \end{figure}
 
 \subsection{Test Image}
+\begin{figure}[t]
+    \centering
+    \begin{subfigure}{0.8\textwidth}
+        \includegraphics[width=\textwidth]{../figures/testimg_uncalibrated_hybrid.pdf}
+        \subcaption{uncalibrated}
+    \end{subfigure}
+    \begin{subfigure}{0.8\textwidth}
+        \includegraphics[width=\textwidth]{../figures/testimg_calibrated_hybrid.pdf}
+        \subcaption{calibrated}
+    \end{subfigure}
+    \caption{Backprojection-FFT-Hybrid image generated from real data}
+    \label{fig:hybrid_testimg}
+\end{figure}
 
 \section{Conclusion}
 
@@ -376,4 +389,4 @@ Its theoretical performance is investigated in the next section. Afterwards, a t
 % 1.3.: antennas
 % 2.3.: imaging
 % 3.3.: Intro, Conclusion, discussion
-% 4.3.: formatting, printing
+% 4.3.: formatting, printing 
