@@ -39,7 +39,7 @@ are also recorded every minute (cf. \ref{fig:act_temp}).
 
 Due to the static geometry of the setup, the runtime of each transmitted wavefront should be identical.
 Thus, the ideal deramped signal should be of a single, constant frequency and without inter-channel phase differences.
-For analysis, system runtime and temperature cannot be considered independent variables, as illustrated in figure \ref{fig:exp_temp}:
+For analysis, system runtime and temperature cannot be considered independent variables, as illustrated in \autoref{fig:exp_temp}:
 The system starts at ambient temperature, heating up and approaching a stable operating temperature on turning on ($t_0$), and cooling back down after turning off ($t_1$).
 
 \begin{figure}
@@ -67,16 +67,16 @@ Also, the reflector peak may wander if the setup geometry moves.
 The primary objective of this experiment is to determine whether the system characteristics remain constant over time. 
 This objective can be distilled into an examination of the channel gains $\underline C_k$.
 Because of the aforementioned imperfections in the experiment, some preprocessing is required to analize the systematic offsets present in the radar signal.
-Multiple additional peaks in the spectrum are visible in figure \ref{fig:avg_intensity}.
+Multiple additional peaks in the spectrum are visible in \autoref{fig:avg_intensity}.
 It is therefore prudent to limit the analysis to only the FFT-bin at the maximum of the peak caused by the reflector.
-In theory, this FFT-bin should contain the exact channel gain (see also eqn. \ref{eqn:y_fft}):
+In theory, this FFT-bin should contain the exact channel gain (see also \autoref{eq:y_fft}):
 \begin{align}
     \hat{\underline{C}}_k[l] = \left.\mathcal{F}\{ y_k[m;l]\}\right|_{\Omega=\hat \Omega[l]} \\
     \text{with } \hat\Omega[l] = \arg \underset{subscript}{argument}\max |\mathcal{F}\{ y_k[m;l]\}
 \end{align}
 In practice, the measurement environment exhibits some minor changes, for example in temperature and humidity, 
 which can result in the geometry to shift by up to a few millimeters.
-This shows by the spectral maximum shifting over time, as seen in figure \ref{fig:refldist}.
+This shows by the spectral maximum shifting over time, as seen in \autoref{fig:refldist}.
 \begin{figure}
     \centering
     \begin{subfigure}[t]{.45\textwidth}
@@ -129,7 +129,7 @@ TODO : split new measurement into heating up (23:00-8:00) and stable (13:00-12:0
 
 
 \subsection{Effects of Self-Calibration}
-As described in section \ref{sec:imcr}, the AWR2243P-chips undergo a self-calibration upon initialization.
+As described in \autoref{sec:imcr}, the AWR2243P-chips undergo a self-calibration upon initialization.
 This initialization can be triggered by either restarting the entire system 
 or by re-writing the configuration registers on the radar chips.
 Indeed, this initial calibration can be observed in the data (cf. \ref{fig:restart}).
@@ -153,8 +153,11 @@ TODO: quantify amount of discontinuity
 
 
 \subsection{Antenna Separation}
-TODO: split gains like in 3.3.7
-
+The channel drifts can be separated into 
+\begin{figure}
+    \centering
+    \includegraphics[options]{../../antenna_drif}
+\end{figure}
 \subsection{Differences between Antennas}
 TODO: Plots, antenna Separation
 

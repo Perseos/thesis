@@ -5,7 +5,6 @@ elucidating the distinctions between single-channel and MIMO configurations.
 Subsequently, we delve into the intricacies of image reconstruction techniques,
 exploring both the Discrete Fourier Transform (DFT) approach and the proposed backprojection algorithm.
 
-- Window Functions
 \section{Antenna Fundamentals}
 
 The fundamental working principle of radars is to transmit an electromagnetic wave,
@@ -45,7 +44,7 @@ While notable differences exist among the zones,
 there are no sudden shifts in the field configurations as one transitions between them.
 
 \subsection{Antenna Parameters}
-\label{ssec:antenna_params}
+\label{sec:antenna_params}
 In the following, a set of key parameters is defined that are used to describe an antenna's performance.
 They are adapted from the definitions in \cite{ieee_defs} and \cite{balanis}.
 All quotations in this paragraph, unless stated differenty, are from \cite{ieee_defs}.
@@ -164,7 +163,7 @@ Then, we extend our analysis to encompass Multiple Input Multiple Output (MIMO) 
 highlighting the unique characteristics and complexities associated with their signal model.
 
 \subsection{Single Channel FMCW}
-\label{ssec:single_channel_fmcw}
+\label{sec:single_channel_fmcw}
 A single channel consists of a transmit antenna and a receive antenna.
 The continuous wave signal $x_{TX}(t)$ send by the transmit antenna
 is reflected by an ideal point scatterer at position $\vec r_S$
@@ -177,7 +176,7 @@ the electric signal of amplitude $A_0$\footnote{
     In later sections, it is often assumed without loss of generality that $A_0=1$ to reduce the length of equations.
 } outputted by the transmitter takes the following shape:
 \begin{align}
-    x_{TX}(t) & = A_0 e^{j(\omega_0t + \frac{1}{2}\dot \omega t^2 + \phi_0)} \label{eqn:x_TX} \\
+    x_{TX}(t) & = A_0 e^{j(\omega_0t + \frac{1}{2}\dot \omega t^2 + \phi_0)} \label{eq:x_TX} \\
 \end{align}
 
 After a propagation delay $\tau$, the signal arrives back at the receiver.
@@ -190,7 +189,7 @@ and the locations of the scatterer, the receive antenna and the transmit antenna
 The ratio of receive to transmit power is defined in the Radar Range Equation in \cite{balanis},  p. 98f:
 \begin{align}
     \frac{P_{Rx}}{P_{Tx}} = \sigma \frac{G_{Tx}(\theta_{Tx}) G_{Rx}(\theta_{Rx})}{4\pi} \left(\frac{\lambda}{4\pi R_1 R_2}\right)^2
-    \label{eqn:channel_gain}
+    \label{eq:channel_gain}
 \end{align}
 Here, $G_{Tx}(\theta_{Tx})$ and $G_{Rx}(\theta_{Rx})$ describe the transmit gain and maximum receive gains
 in direction of the target, $\lambda$ is the wavelength, and $R_1$ and $R_2$ are the distances to the scatterer
@@ -227,14 +226,14 @@ The resulting signal $y(t)$ is called \textit{intermittent frequency} signal.
     \cdot  \text{BP} \left\{
     e^{j(2\omega_0 t + \frac{1}{2}\dot\omega t^2 - \dot\omega\tau t)}
     \right\}                                                                             \\
-         & \approx C(\vec r_S)e^{-j\omega_0\tau} e^{-j\dot\omega\tau t} \label{eqn:y_IF}
+         & \approx C(\vec r_S)e^{-j\omega_0\tau} e^{-j\dot\omega\tau t} \label{eq:y_IF}
 \end{align}
 From this, the complex channel gain\footnote{
     A way to interpret the complex channel gain is through S-parameters of a two-port network,
     since it relates the incident power wave at the transmit antenna's port to the outgoing power wave at the receiver.
 } $\underline C(\vec r_S)$ can be defined:
 \begin{align}
-    \underline C(\vec r_S) = C(\vec r_S)e^{-j\omega_0\tau} \label{eqn:G}
+    \underline C(\vec r_S) = C(\vec r_S)e^{-j\omega_0\tau} \label{eq:G}
 \end{align}
 
 The fact that the IF-signal contains all the information
@@ -283,13 +282,13 @@ An example MIMO array and its corresponding virtual array can be seen in figures
 The numbering convention for channel index $k$ corresponding to transmit antenna $i$ and receive antenna $j$,
 that is also used throughout the thesis is as follows:
 \begin{align}
-    k = N_{Tx}i + j
+    k = N_{Tx}i + j \label{eqn:kij}
 \end{align}
 In our example, the virtual transmit antenna with $k=5$ corresponds to $(i,j)=(1,2)$. \\
 
 Once the received signals are demultiplexed, the ideal receive signal for antenna pair $k \in \{0,1,...K-1\}$:
 \begin{align}
-    y_k(t) & = \underline C_k e^{-j\dot\omega\tau_k t} \label{eqn:ideal_scatterer}
+    y_k(t) & = \underline C_k e^{-j\dot\omega\tau_k t} \label{eq:ideal_scatterer}
 \end{align}
 In reality, the scene can consist of an arbitrary number of scatterers ($P$),
 that each have their own radar cross section $\sigma_{p,k}, l \in \{0,1,...P-1\}$
@@ -304,7 +303,8 @@ which we summarize as $n_k(t)$. Thus, the overall IF-signal is:
     y_k(t) & = \sum_{s=0}^{L-1} \underline C_k(\vec r_s; \sigma_{l,k}) e^{-j\dot\omega\tau_k(\vec r)t} + n_k(t)
 \end{align}
 After sampling the signal at sampling intervals $T_s$ such that the sampling frequency $f_s = \frac{1}{T_s}$
-is sufficiently high: ${2f_s > \frac{1}{2\pi}(\omega_0 + \dot \omega T_{chirp})}$, and with $M$ samples such that $MT_s < T_{chirp}$,
+is sufficiently high, i.e.\ fulfilling the Nyquist criterion:
+${2f_s > \frac{1}{2\pi}(\omega_0 + \dot \omega T_{chirp})}$, and with $M$ samples such that $MT_s < T_{chirp}$,
 the sampled IF-signal can be defined as:
 \begin{align}
     y_k[m] = y_k(t=mT_s), \text{for}\;m \in \{0,1,..M-1\}
@@ -316,6 +316,41 @@ the sample index $m$ regarding the time offset within a single chirp
 is referred to as the \emph{short time} dimension,
 whereas the sample index $l$ regarding time offset between chirps
 is known as the \emph{long time} dimension \parencite[see][pp. 290f.]{richards}.
+
+\subsection{Discrete Fourier Transform}
+An important tool in digital signal processing is the \emph{discrete Fourier transform (DFT)}.
+It is widely used to compute the frequency spectrum of a given discrete time signal.
+The DFT spectrum $Y[n]$ of a discrete signal $y[m]$ is computed as follows:
+\begin{align}
+    Y[n] = \sum_{m=0}^{M-1}y[m]e^{-j\frac{2\pi n}{N}m}
+\end{align}
+An alternative formulation computes a continuous spectrum $Y(\Omega)$
+from the discrete input signal:
+\begin{align}
+    Y(\Omega) = \sum_{m=0}^{M-1}y[m]e^{-j\Omega m}, \Omega \in [-\pi, \pi]
+\end{align}
+
+A highly efficient implementation of the DFT is the FFT algorithm, which,
+for a given data size $n$, reduces the runtime of the regular DFT $\mathcal O(n^2)$ to $\mathcal O(n\text{log}n)$ \cite{fft_algorithm}.
+
+In \cite[pp. 509--513]{richards} explains the necessity of windowing when using the FFT.
+To summarize, the FFT works under the assumtion that its input time signal continues periodically before and after the supplied set of samples.
+Thus, any discontinuities between the first and last sample show in the spectrum as spectral leakage.
+This spectral leakage can mask weaker spectral components, as illustrated in \autoref{fig:richards_sidelobes}a.
+
+To address this issue, so-called \emph{window functions}, also known as \emph{tapering functions},
+can be applied to the input signal. These functions gradually reduce the amplitude of the signal at the edges,
+effectively fading it in and out. By doing so, they remove the discontinuities that cause spectral leakage,
+thus mitigating problems like masking, as illustrated in \autoref{fig:richards_sidelobes}b.
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{../../figures/richards_sidelobe_masking.pdf}
+    \caption{
+        (a) Masking of a weak target response at $\hat f = 0$ by the sidelobes of a \SI{30}{\dB} stronger response at $\hat f = 0.2$.
+        (b) Same two responses with Hamming window applied before the DTFT.
+        Image and caption from \cite[p.510]{richards}}
+    \label{fig:richards_sidelobes}
+\end{figure}
 
 
 \section{Image Reconstruction}
@@ -332,22 +367,8 @@ In this thesis, the DFT-- and backprojection based approaches
 are implemented and evaluated for a MIMO radar system.
 The MUSIC algorithm is also briefly introduced to give an indication of its complexity.
 
-\subsection{Discrete Fourier Transform}
-\label{ssec:dft_imaging_theory}
-The DFT is widely used to compute the frequency spectrum of a given discrete time signal.
-The DFT spectrum $Y[n]$ of a discrete signal $y[m]$ is computed as follows:
-\begin{align}
-    Y[n] = \sum_{m=0}^{M-1}y[m]e^{-j\frac{2\pi n}{N}m}
-\end{align}
-An alternative formulation computes a continuous spectrum $Y(\Omega)$
-from the discrete input signal:
-\begin{align}
-    Y(\Omega) = \sum_{m=0}^{M-1}y[m]e^{-j\Omega m}, \Omega \in [-\pi, \pi]
-\end{align}
-
-A highly efficient implementation of the DFT is the FFT algorithm, which,
-for a given data size $n$, reduces the runtime of the regular DFT $\mathcal O(n^2)$ to $\mathcal O(n\text{log}n)$ \cite{fft_algorithm}.
-
+\subsection{FFT-based Imaging}
+\label{sec:dft_imaging_theory}
 In this approach, the FFT is applied over three dimensions of the input signal,
 obtaining a discrete output signal in spherical coordinates whose amplitude is an estimate of the locational reflectivity.
 
@@ -355,7 +376,7 @@ For each input channel, the range of a target can be estimated by applying the D
 The resulting spectrum's peak corresponds to the target:
 \begin{align}
     \mathcal{F}_m\{y_k[m]\}(\Omega) & = \sum_{m=0}^{M-1} e^{-j2\pi\frac{m\Omega}{M}} y_k[m]                                       \\
-                                    & = \underline C_k(\vec r_S) \delta(\Omega-\dot \omega \tau_k(\vec r_S)T_s) \label{eqn:y_fft}
+                                    & = \underline C_k(\vec r_S) \delta(\Omega-\dot \omega \tau_k(\vec r_S)T_s) \label{eq:y_fft}
 \end{align}
 
 
@@ -407,13 +428,13 @@ by calculating the DFT over time, and the DFTs over the rows and columns of the 
 For this to work, the scatterer needs to be distant enough for the wavefronts to be planar,
 and the virtual array's grid needs to be uniformly spaced with $d=\lambda_0/2$ spacing.
 
-\subsection{Backprojection}
-\label{ssec:bp_imaging_theory}
-Compared to the DFT-based approach, backprojection takes fewer approximations and requirements on the array to work,
+\subsection{Backprojection Imaging}
+\label{sec:bp_imaging_theory}
+Compared to the FFT-based approach, backprojection takes fewer approximations and requirements on the array to work,
 while theoretically using a similar amount of computation.
 The approach works by correlating the input signal $y_k[m]$
 to the theoretical signal $s_k[m, \vec r]$ of an ideal scatterer at different locations.
-The mean correlation of all channels to the theoretical signal is then used as an estimate for the locational RCS $\hat F(\vec r)$:
+The mean correlation of all channels to the theoretical signal is then used as an estimate for the recorded scene $\hat F(\vec r)$:
 \begin{align}
     \hat F(\vec r) & = \frac{1}{K} \sum_{k=0}^{K-1} s_k[m, \vec r] \star y_k[m]             \\
                    & = \frac{1}{K}\sum_{k=0}^{K-1}\sum_{m=0}^{M} s_k^\ast[m, \vec r] y_k[m]
@@ -421,8 +442,8 @@ The mean correlation of all channels to the theoretical signal is then used as a
 Using the signal model from (\ref*{eqn:ideal_scatterer}) yields:
 \begin{align}
     \hat F(\vec r) & = \frac{1}{K}\sum_{k=0}^{K-1}\sum_{m=0}^{M}
-    G_k^\ast(\vec r)e^{+j\dot\omega\tau_k(\vec r_S)mT_s} y_k[m]
-\end{align}
+    \underline C_k^\ast(\vec r)e^{+j\dot\omega\tau_k(\vec r_S)mT_s} y_k[m]
+\end{align} \\
 
 To reduce the computational intensity of this algorithm,
 a hybrid approach\cite{realtime_bp} proposes that
@@ -438,8 +459,12 @@ calculating the inner sum (over $m$) can be rewritten as an inverse discrete fou
     \mathcal{F}_m^{-1} \left\{ y_k[m]\right\}(\Omega=\dot\omega\tau_k(\vec r_S)T_s)
 \end{align}
 
+In practice, the result of the inverse FFT is not continuous in $\Omega$ as suggested above,
+but rather only available at a set number of sample points $n$.
+The resulting error can be reduced by zero-padding the input to the inverse FFT,
+increasing the amount of sampled frequencies.
 
-\subsection{MUSIC}
+\subsection{MUSIC Imaging}
 The Multiple Signal Classification (MUSIC) algorithm \cite{music} is also widely used in radar imaging ().
 In our case, it operates on the time-domain fourier transform of the IF-signal,
 and makes similar far-field approximations as the DFT-based approach.
@@ -490,7 +515,8 @@ it is also rather computationally intensive.
 For high numbers of channels and/or high image resolutions,
 the computational intensity may become prohibitive for application.
 
-\subsection{Runtime Analysis}
+\subsection{Complexity Analysis}
+\label{sec:complexity_analysis}
 Suppose $M$ samples are available for the $K$ channels of an $N\times N$ uniform rectangular array.
 The fastest of the three algorithms is the FFT-based algorithm.
 It first applies an FFT to each of the $K=N^2$ channels.
@@ -499,13 +525,13 @@ Finally, the elevation FFT is applied to the each of the $N$ vertical sub-arrays
 The resulting image has a resolution of $M \times N \times N$.
 The total runtime comes out to:
 \begin{align}
-    N^2 \mathcal O(M \log M) + 2MN \mathcal O(N \log N) = \mathcal O \left(MN^2\log (MN^2) \right)
+    N^2 \mathcal O(M \log M) + 2MN \mathcal O(N \log N) = \mathcal O \left(MN^2\log (MN^2) \right) = \mathcal O (MK \log MK)
 \end{align}
 
 Backprojection's runtime scales linearly with the target resolution of the image.
 If the target image consists of $Z$ different voxels,
-then for each voxel, $M\times K$ weights are calculated, applied to the data and the result is summed up ($(M-1) \times (K-1)$ operations).
-The total runtime is:
+then for each voxel, $M\times K$ weights are calculated, applied to the data, and the result is summed up (taking $(M-1) \times (K-1)$ operations).
+The overall runtime is:
 \begin{align}
     Z \left(\left(\mathcal O(MK) + \mathcal O(MK) + \mathcal O((M-1)(K-1))\right)\right) = \mathcal O(ZMK)
 \end{align}

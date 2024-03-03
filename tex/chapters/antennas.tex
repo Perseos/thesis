@@ -22,7 +22,7 @@ While the relative position of the rotating axis can be recorded with a decent r
 the absolute positioning of the reflector is hard to achieve with the same accuracy.
 The sensor itself can however be used to improve positioning accuracy:
 during setup, the phase of the peak caused by the reflector
-is extracted with a similar method as in section \ref{sec:stability_analysis} and displayed.
+is extracted with a similar method as in \autoref{sec:stability_analysis} and displayed.
 Mimimizing the phase differences between the array's channels by fine-tuning the reflector's position
 ensures that it be located at boresight.
 These measurements are repeated with multiple distances of the relector.\\
@@ -42,20 +42,39 @@ adding complexity and inaccuracy to the subsequent analysis.
 
 \subsection{Preprocessing and Analysis}
 The objective of the subsequent analysis is to extract the antenna gains from the measured IF-signals.
-In section \ref{ssec:single_channel_fmcw}, 
+In \autoref{sec:single_channel_fmcw}, 
 the the ideal deramped signal $y_{kl}[m]$ from channel $k$ at long-time index $l$
 for a single reflector at position $\vec r_l$
 is defined in equation (\ref{eqn:channel_gain}) :
 \begin{align*}
     y_{kl}[m] =  C_k(\vec r_l)e^{-j\omega_0\tau_{kl}}e^{-j\dot\omega\tau_{kl}mT_s}
 \end{align*}
-The square of the channel gain directly relates to the antenna gains $A_i$ and $B_j$ 
+The square channel gain directly relates to the antenna gains $A_i$ and $B_j$ 
 of the transmit antenna with index $i$ and the receive antenna with index $j$ that make up the channel:
 \begin{align*}
     C_k^2 = \frac{P_{Rx}}{P_{Tx}} 
-    =  A_i B_j \frac{\sigma}{4\pi} \left(\frac{\lambda}{4\pi R_1 R_2}\right)^2
+    = G_{Tx}(\theta,\phi)  G_{Rx}(\theta,\phi) \frac{\sigma}{4\pi} \left(\frac{\lambda}{4\pi R_1 R_2}\right)^2
 \end{align*}
+For simplicity's sake, the following quantities are defined:
+\begin{align}
+    c_k(\theta,\phi) := \frac{C_k(r,\phi,\theta)}{\max |C_k(r,\phi,\theta)|}
+\end{align}
+will be called the \emph{channel characteristic}, and assumed to be constant in $r$ with $c_k(\theta,\phi) \in [0,1]$.
+The \emph{antenna gains} are the relative maximum antenna gains of the transmit and receive antennas:
+\begin{align}
+    \underline A_i &:=  \frac{\max G_{Tx,i}(\theta,\phi)}{ G_{Rx,0}(\theta,\phi)}e^{j\psi_i} \\
+    \underline B_j &:=  \frac{\max G_{Rx,j}(\theta,\phi)}{ G_{Rx,0}(\theta,\phi)}e^{j\vartheta_j}
+\end{align}
+As defined in \autoref{eqn:kij}, each channel $k$ has a corresponding transmit antenna $i$ and a receive antenna $j$.
+All antenna gains are defined with regards to the reference antenna, receive antenna 0.
+They also include a phase offset which describe any mismatches in the individual antenna, 
+such as polarization, reflections in the antenna ports or length offsets in the transmission lines leading to them.
 
+With that, the radar range equation can be rewritten as follows:
+\begin{align*}
+    \underline C_k^2 = \underline A_i \underline B_j c_k(\theta\phi) e^{j\left(2\varphi_k-\omega_0\frac{R_1+R_2}{c_0}\right)}
+                        \frac{\sigma}{4\pi} \left(\frac{\lambda}{4\pi R_1 R_2}\right)^2
+\end{align*}
 
 
 The goal of the subsequent analysis is twofold:
@@ -63,16 +82,16 @@ to extract all parameters of the above signal model while identifying and removi
 
 Limiting the analysis to a single range bin will work towards both reducing interference and extracting parameters:
 ideally, the DFT spectrum of the IF signal consists of just a single peak,
-weighted with the channel gain $C_k(\vec r)$ (see eqn. \ref{eqn:y_fft}).
+weighted with the channel gain $C_k(\vec r)$ (see \autoref{eq:y_fft}).
 Thus, the channel gain can be extracted if the correct bin $\hat \Omega$ is picked:
 \begin{align}
     \hat \Omega                                               & = \dot \omega \tau_k(\vec r_S)T_s    \\
                                                               & = \dot \omega \frac{R_1+R_2}{c}T_s      \\
-    \Rightarrow \mathcal{F}_m\{y_k[m]\}(\Omega = \hat \Omega) & =    \underline C_k(\vec r_S) \label{eqn:G_fft}
+    \Rightarrow \mathcal{F}_m\{y_k[m]\}(\Omega = \hat \Omega) & =    \underline C_k(\vec r_S) \label{eq:G_fft}
 \end{align}
 
 \subsection{Range Estimation}
-\label{ssec:range_est}
+\label{sec:range_est}
 
 \begin{figure}
     \centering
@@ -124,30 +143,30 @@ the mean being computed as the average over all $K$ channels and $L$ sensor rota
     = \frac{1}{KL}\sum_{l=0}^{L-1} \sum_{k=0}^{K-1} ( R_{k,l} - \hat  R_{k,l}(\hat R_s, \hat \theta_s, \hat \epsilon))^2
 \end{align} \\
 
-Figure \ref{fig:reflpos_estimate} shows the result of 100 iterations at an adaption rate of 0.05 at the example of three different channels,
+\autoref{fig:reflpos_estimate} shows the result of 100 iterations at an adaption rate of 0.05 at the example of three different channels,
 comparing the measured spectral peaks (shown as points) to the estimated position (dotted line) of the reflector.
 Only a subset of orientations is used for the estimate,
 namely \SI{-50}{\degree} $<\theta_l-$\SI{90}{\degree}$<$ \SI{20}{\degree}. \\
 
 For the first three measurements, the peak location oscillates around the estimate by \SIrange[range-units=single]{1}{2}{\cm}.
-The root mean square error is reduced to \SI{11}{\mm}
+The \emph{root mean square error} (RMSE) is reduced to \SI{11}{\mm}.
 Due to the decreasing signal level received from higher distances, 
-the fourth measurement has a higher relative noise level, resulting higher movement of the spectral peaks.
+the fourth measurement has a higher relative noise level, resulting higher movement of the spectral peaks, and hence a much higher RMSE.
 
 \subsection{Amplitude}
-\label{ssec:amplitude}
+\label{sec:amplitude}
 First, the recorded amplitudes are analyzed, beginning with the influence of the angle of arrival.
 To do this, each channel's range FFT spectrum's amplitude is evaluated at the respective calculated peak location $\hat \Omega$,
 and then normalized by dividing it by its maximum.
 
-The first parameters to extract are the three factors $A_{Tx}$, $A_{Rx}$ and $A_S(\theta_S,\phi_S)$.
-Since the angle of arrival's impact has been constrained to $[0,1]$, we know that
+The first parameters to extract are the three real-valued factors $A_i$, $B_j$ and $c(\theta,\phi)$.
+Since the channel characteristic has been constrained to $[0,1]$, we know that
 \begin{align}
-    \underset{\theta,\phi}{\text{max}} |G_k(R,\theta,\phi)|  = \frac{A_k}{R^2} \label{eqn:max_G}
+    \underset{\theta,\phi}{\text{max}} |\underline C_k(R,\theta,\phi)|  = \frac{C_k}{R^2} \label{eq:max_G}
 \end{align} \\
-With that, an estimate of the channel gain $A_k$ at exactly \SI{1}{\meter} can be obtained via linear regression.
-An example linear regression is shown in figure \ref{fig:ch0_amp_linreg},
-and the resulting estimates with their standard deviations are summarized in figure \ref{fig:amp_linreg}. \\
+With that, an estimate of the maximum channel gain $C_k$ at exactly \SI{1}{\meter} can be obtained via linear regression.
+An example linear regression is shown in \autoref{fig:ch0_amp_linreg},
+and the resulting estimates with their standard deviations are summarized in \autoref{fig:amp_linreg}. \\
 
 \begin{figure}
     \centering
@@ -166,11 +185,11 @@ and the resulting estimates with their standard deviations are summarized in fig
 Having estimated the channel gains, we can now turn to analysing the angle-of-arrival characteristics.
 Assuming the omptimal range bin $\hat \Omega$ is evaluated each time, we get
 \begin{align}
-    \left|\mathcal{F}_m\{y_k[m]\}(\Omega = \hat \Omega)  \right| =  \frac{A_kA_S(\theta_S,\phi_S)}{R_{k}^2} =  |G_k(\vec r_S)|
+    \left|\mathcal{F}_m\{y_k[m]\}(\Omega = \hat \Omega)  \right| =  \frac{A_iB_jc_k(\theta,\phi)}{R_{k}^2} =  |G_k(\vec r)|
 \end{align}
 Dividing that by the maximum gain (\ref{eqn:max_G}) yields
 \begin{align}
-    \frac {|G_k(\vec r_S)|}{\underset{\theta,\phi}{\text{max}} |G_k(R,\theta,\phi)|}  = A_S(\theta,\phi)
+    \frac {|C_k(\vec r)|}{\underset{\theta,\phi}{\text{max}} |C_k(R,\theta,\phi)|}  = c_k(\theta,\phi)
 \end{align}
 
 \begin{figure}
@@ -180,7 +199,7 @@ Dividing that by the maximum gain (\ref{eqn:max_G}) yields
     \label{fig:mean_amp}
 \end{figure}
 
-Figure \ref{fig:mean_amp} provides an overview by displaying the mean channel characteristic for each measurement.
+\autoref{fig:mean_amp} provides an overview by displaying the mean channel characteristic for each measurement.
 It can be seen that the gain is strongest when the target is directly in boresight,
 tapering off when the target is off-center. The reduction in gain is stronger when the target
 moves off to the side in the elevation, than in azimuth. While the target remains stronger
@@ -212,7 +231,7 @@ Namely, in the former range, the gain seems to oscillate every 16 channels.
     \label{fig:chan_amp_tx0}
 \end{figure}
 
-To explore further, figure \ref{fig:chan_amp_tx0} zooms in on one period.
+To explore further, \autoref{fig:chan_amp_tx0} zooms in on one period.
 It shows the channel gain of the horizontal measurements for angles \SIrange{30}{60}{\degree}
 of the channels in which transmit antenna 0 is active, arranged by the horizontal position of the receive antenna, from left to right.
 It can now be seen that the channel gain of antennas closer to the sensor mount's protrusion drops
@@ -224,16 +243,15 @@ the measurements have to be repeated with the sensor mounted on the outside.\\
 With this, the individual antenna gains and the channel characteristics have been extracted from the data.
 In the next step, the recorded phases are analyzed.
 
-\newpage
 \subsection{Phase Estimation Techniques}
 The first step in extracting the phase parameters from the recorded data is yet again
 evaluating the signal's DFT phase at the optimum range bin $\hat \Omega = \frac{ N \dot \omega}{c_0 f_s}\hat R_k$,
 which according to (\ref{eqn:G_fft}) should ideally yield
 \begin{align}
-    \Phi_k(\vec r_S) :     & = \text{arg} \mathcal{F}_m\{y_k[m]\} (\hat \Omega(\vec r_S)) \\
-                           & =    \text{arg}G_k(\vec r_S)                                 \\
-                           & = \omega_0\tau_k(\vec r_S) + \varphi_k                       \\
-    \text{with } \varphi_k & = \varphi_{Tx,i}+\varphi_{Rx,j},  k=N_{rx}i+j                \\
+    \Phi_k(\vec r_S) :     & = \text{arg} \mathcal{F}_m\{y_k[m]\} (\hat \Omega(\vec r_S))^2 \\
+                           & =    \text{arg}C_k(\vec r_S)^2                                 \\
+                           & = 2\omega_0\tau_k(\vec r_S) + 2\varphi_k                       \\
+    \text{with } 2\varphi_k & = \psi_{i}+\theta_{j}                \\
     \text{ and } \tau_k    & = \frac{2R_k}{c_0}
 \end{align}
 
@@ -247,12 +265,12 @@ To illustrate, a change of $\Delta R_k = \SI{1}{\mm}$ would cause approximately 
                  & = 2\pi \cdot \SI{77e9}{\Hz} \cdot \frac{2\cdot\SI{1e-3}{\m}}{\SI{3e8}{\m/\s}} \\
                  & = 0.5133 \pi = \SI{92.4}{\degree}
 \end{align*}
-The range estimate made in section \ref{ssec:range_est} had an RMSE of at least \SI{11}{\mm},
+The range estimate made in \autoref{sec:range_est} had an RMSE of at least \SI{11}{\mm},
 which introduces high uncertainty into the phase evaluation. \\
 
 Another method to extract the phase from the recorded data is evaluating the FFT at the spectral peak,
 which was the method of choice in \ref{sec:stability_analysis}.
-% One advantage of this method is that it is more robust to interference at frequencies close to the target frequency, as will be shown in the following.
+Which method copes better with the presence of interference?
 In the following, we will illustrate the effects of interference with a simulated signal,
 as well as the impact of the interference on the two estimation methods accuracy.
 
@@ -264,16 +282,14 @@ This results in our ideal signal
     y_{id}(t=mT_s,\theta) = 1 \cdot e^{-j\omega(\theta)mT_s}
 \end{align*}
 Introducing a source of interference with constant frequency $\omega_0$ and the amplitude $0.1$,
-as well as a gaussian noise source $n(t,\theta) \sim \mathcal{N}(0;0.001)$,  we get
-
-TODO: remove $n(t,\theta)$; just use vmin in image plots
+as well as a gaussian noise source $n(t,\theta) \sim \mathcal{N}(0;0.001)$, we get
 
 \begin{align*}
     y(t=mT_s,\theta) = 1 \cdot e^{-j\omega(\theta)mT_s} + 0.1 \cdot e^{-j\omega_0 mT_s} + n(t,\theta)
 \end{align*}
 
 The spectrum of the ideal signal $Y_{id}(\Omega, \theta)$ and the degraded signal $Y(\Omega,\theta)$,
-calculated with an $N=2048$ point FFT with $M=512$ samples for every one of the 1000 ``angles'' $\theta$,
+calculated with an $N=2048$ point FFT with $M=512$ samples in long-time, each corresponding to a different angle $\theta$,
 is shown in fig. \ref{fig:interference_test_spectrum} in amplitude and phase.
 \begin{figure}
     \centering
@@ -289,7 +305,6 @@ showing that the interference causes the spectral maximum to move from its ideal
         \includegraphics[width=\textwidth]{../figures/interference_test_peak.pdf}
         \subcaption{Peak Frequency}
         \label{fig:interference_test_peak}
-
     \end{subfigure}
     \hfill
     \begin{subfigure}{0.49\textwidth}
@@ -299,14 +314,14 @@ showing that the interference causes the spectral maximum to move from its ideal
     \end{subfigure}
     \caption{Extracting Phase from example spectra $Y$ and $Y_{id}$}
 \end{figure} \\
-Figure \ref{fig:interference_peak_phase} finally shows the effect of interference on the phase.
+\autoref{fig:interference_peak_phase} finally shows the effect of interference on the phase.
 We compare the phase of the ideal signal to phase of the degraded signal,
 which is evaluated at both the ideal and the degraded signal's spectral maxima.
 It can be seen that the latter method's phase diverges much more strongly from the ideal phase than that of the former,
 and should therefor be preferred in the subsequent analysis. \\
 
 \subsection{Phase Analysis}
-\label{ssec:phase_analysis}
+\label{sec:phase_analysis}
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{../figures/phase_estimates.pdf}
@@ -320,7 +335,7 @@ the phase of any given channel will be unwrapped from its original domain of $\t
 are visible when plotting phase against sensor orientation, while maintaining the original phase for $\theta = \theta_s$.
 
 To assess the performance of the two techniques introduced in the previous section,
-figure \ref{fig:measured_peak_phase} shows how they each compare to the signal model
+\autoref{fig:measured_peak_phase} shows how they each compare to the signal model
 \footnote{
     In this case, the signal model shown for comparison assumes that $\varphi_k = 0,\, \forall 0 \leq k<K$.
     Thus, the phase shown here is directly proportional to the estimated range $\hat R_k$:
@@ -337,8 +352,8 @@ the phase evaluated at the signal peak is much smoother and matches our signal m
     \label{fig:ch12_phase_linreg}
 \end{figure}
 Now, the channel phase offsets $\hat \varphi_k$ can be estimated using linear regression.
-Figure \ref{fig:ch12_phase_linreg} shows an example linear regression,
-and the resulting channel phase offsets are shown in figure \ref{fig:phase_linreg}.
+\autoref{fig:ch12_phase_linreg} shows an example linear regression,
+and the resulting channel phase offsets are shown in \autoref{fig:phase_linreg}.
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{../figures/phase_linreg.pdf}
@@ -351,28 +366,28 @@ To describe the array in terms of its channel gains is somewhat redundant.
 As was defined in the underlying signal model, each channel gain $C_ke^{j\varphi_k}$ in actuality
 just the product of the transmit and receive antenna gains, that is
 \begin{align}
-    C_ke^{j\varphi_k} = A_i e^{j\psi_i} \cdot B_j e^{j\vartheta_j} \text{ for } k=N_{Tx}i+j
+    C_k^2e^{j2\varphi_k} = A_i e^{j\psi_i} \cdot B_j e^{j\vartheta_j} \text{ for } k=N_{Tx}i+j
 \end{align}
 
 To more accurately describe the array,
 the next step in our analysis is to estimate antenna gains of the receive and transmit array.
-Since multiple combinations are feasible, the rightmost receive antenna 0 is defined as reference antenna,
+Multiple combinations were feasible, but the rightmost receive antenna 0 was defined as a reference antenna,
 such that $B_0=1$ and $\vartheta_0 = 0$.
 
-In the following, the channel gain amplitudes $\hat C_k$ that were estimated in section \ref{ssec:amplitude},
-and the channel phase offsets $\hat \varphi_k$ from section \ref{ssec:phase_analysis}
+In the following, the channel gain amplitudes $\hat C_k$ that were estimated in \autoref{sec:amplitude},
+and the channel phase offsets $\hat \varphi_k$ from \autoref{sec:phase_analysis}
 are used to obtain estimates for the transmit and receive antenna parameters. \\
 
 Thanks to the definition of a reference antenna,
 the transmit antennas' amplitude and phase are easily obtained:
 \begin{align}
-    \hat A_i    & = \left.\hat C_k \right|_{k=N_{Tx}i}       \\
-    \hat \psi_i & = \left.\hat \varphi_k \right|_{k=N_{Tx}i}
+    \hat A_i    & = \left.\hat C_k^2 \right|_{k=N_{Tx}i}       \\
+    \hat \psi_i & = \left.2\hat \varphi_k \right|_{k=N_{Tx}i}
 \end{align}
 With that, a least squares estimate for the remaining receive antennas' amplitude and phase is:
 \begin{align}
-    \hat B_{j\neq0}         & = \frac{1}{N_{Tx-1}} \sum_{i=1}^{N_{Tx-1}} \left. \frac{\hat C_k}{\hat A_i} \right|_{k=N_{Tx}i},         \\
-    \hat \vartheta_{j\neq0} & = \frac{1}{N_{Tx-1}} \sum_{i=1}^{N_{Tx-1}} \left. \frac{\hat \varphi_k}{\hat \psi_i} \right|_{k=N_{Tx}i}
+    \hat B_{j\neq0}         & = \frac{1}{N_{Tx-1}} \sum_{i=1}^{N_{Tx-1}} \left. \frac{\hat C_k^2}{\hat A_i} \right|_{k=N_{Tx}i},         \\
+    \hat \vartheta_{j\neq0} & = \frac{1}{N_{Tx-1}} \sum_{i=1}^{N_{Tx-1}} \left. \frac{2\hat \varphi_k}{\hat \psi_i} \right|_{k=N_{Tx}i}
 \end{align}
 The resulting antenna parameters are shown in tables \ref{tab:tx_gains} and \ref{tab:tx_gains}.
 \begin{table}[h]
@@ -429,7 +444,6 @@ The resulting antenna parameters are shown in tables \ref{tab:tx_gains} and \ref
     \caption{Estimated Antenna Parameters with Reference Rx0}
 \end{table}
 
-TODO: include Formelzeichen $A,B, \psi, \vartheta$
 \subsection{Conclusion}
 In this section, a method for estimating the antenna gains from real-world antenna measurements has been formulated
 that optimizes the estimation's accuracy and robustness against interference.
@@ -448,13 +462,13 @@ The summarized steps are as follows:
           The estimated channel chararacteristic $\hat c_k(\theta,\phi)$ can indicate orientations with low SNR and/or high interference.
     \item Evaluate the phase of the spectrum at the frequency corresponding to the estimated range.
           Unwrap the phase of each channel such that the phase for $\theta = \hat \theta_s$ is in $[-\pi,\pi]$.
-          Find the channel phase offset $\phi_k$ that best matches the signal model to the measured phase.
-    \item Separate each channel gain $\hat C_ke^{j\varphi_k}$ into a transmit gain $A_i e^{j\psi_i}$ and a receive gain $B_j e^{j\vartheta_j}$.
+          Find the channel phase offset $\varphi_k$ that best matches the signal model to the measured phase.
+    \item Separate each square channel gain $\hat C_k^2e^{j2\hat \varphi_k}$ into a transmit gain $A_i e^{j\psi_i}$ and a receive gain $B_j e^{j\vartheta_j}$.
           Do this by defining a receive antenna as a reference.
 \end{enumerate}
 
 Following these steps gives a decent estimate of the systems's physical properties with relatively lax requirements on the measurement itself.
-This is especially desirable since section \ref{sec:stability_analysis} demonstrated a need for frequent in-field calibration,
+This is especially desirable since \autoref{sec:stability_analysis} demonstrated a need for frequent in-field calibration,
 since the system parameters may change after restarting, and also shift over time. \\
 
 More sophisticated methodology is required to achieve accurate measurements of the system.
