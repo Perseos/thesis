@@ -1,12 +1,11 @@
 \chapter{Image Reconstruction}
-
+\label{ch:imaging}
 In the preceding chapter, a comprehensive analysis of the radar stability and antenna gain measurements,
 were conducted to understand the factors influencing system performance over time.
 Valuable insights into the temporal characteristics of the radar system were gained through this investigation,
 serving as the foundation for subsequent imaging experiments.
 
-In this chapter, the focus shifts to radar imaging,
-driven by the overarching goal of extracting meaningful information from radar data.
+In this chapter, the focus shifts to radar imaging.
 Building upon the insights garnered from stability analysis and antenna gain measurements,
 three distinct imaging algorithms are implemented and evaluated using the PyTorch framework.
 These algorithms include an FFT-based approach, a Backprojection method, and a hybrid algorithm combining elements of both.
@@ -67,14 +66,11 @@ The directivity in azimuth and elevation is simulated for multiple distances to 
 
 For this, the input time signal is an ideal point source (see eqn.\ \ref{eqn:ideal_scatterer}),
 located at $(R,\theta=0,\phi=0)$
-% , degraded with CSCG\footnote{circularly symmetric complex Gaussian} noise
-% $\underline{\mathbf n} \sim \mathcal{CN}(0, \sigma^2 \mathbf I) $ and 
-assuming a constant antenna gain of $\underline G_k(r,0,0)=1 \,\forall r,k$:
+assuming a constant channel gain of $\underline C_k(r,0,0)=1 \,\forall r,k$:
 \begin{align}
-    \underline y_k[m] =  e^{-j\dot \omega \frac{2R}{c_0} m T_s}
-    % + \underline n_k[m]
-    ,\,k\in[0,K-1],m\in[0,M-1]
+    \underline y_k[m] =  e^{-j\dot \omega \tau_k m T_s}    ,\,k\in[0,K-1],m\in[0,M-1]
 \end{align}
+The time of flight $\tau_k$ is computed using the physical measurements of the array.
 \\
 The image is computed for multiple distances at resolution
 $N_{range} = 1024, N_{azimuth} = 2048$ and $N_{elevation} = 8$.
@@ -115,11 +111,13 @@ $\theta_{\SI{3}{\dB}}=$ \SI{1.9}{\degree} and $\theta_{\SI{6}{\dB}}=$ \SI{2.6}{\
 
 For direction of arrival estimation in azimuth, the 86-channel ULA subset of the array is well applicable to an FFT-based approach,
 even with its reduced performance in near-field conditions.
-Yet in elevation, such a ULA subset does not exist, as the array is sparse horizontally and vertically (c.f.\ \ref{fig:virt_array}).
+Yet in elevation, such a ULA subset does not exist, as the array is sparse in elevation,
+both horizontally and vertically (c.f.\ \ref{fig:virt_array}):
+in most collums, only one virtaul antenna is present.
 
-To still use the FFT, an approach would be ``backfilling'' the array with zeros
+To still use the FFT, a possible approach would be ``backfilling'' the array with zeros
 to obtain a complete uniformly spaced rectangular virtual array.
-The FFT is then computed over the collumns (c.f.\ \ref{fig:virt_array}) of this array,
+The FFT is then computed over the collumns (c.f.\ \ref{fig:virt_array}) of the resulting URA,
 each yielding a spectrum that is related to the direction of arrival in elevation.
 
 A disadvantage of this approach is that it can cause substantial spectral leakage.
@@ -131,7 +129,6 @@ to applying a binary window function $w[k]$ to the ideal rectangular array $a[k]
     w[0..7]                & = [1,  1,0,0,1,0,1,0 ],         \\
     \text{and}\; a[0..7]   & = [a_0,a_1,a_2,\dots,a_7]
 \end{align*}
-
 
 However, this window function causes additional peaks to appear in the spectrum,
 since multiplication in the time domain is equivalent to convolution in the frequency domain:
@@ -183,10 +180,6 @@ while the third ones move towards $\phi=$ \SI{0}{\degree} and increase in amplit
 TODO:
 
 - Change Code listing
-
-- Mention Taper Functions!!
-
-- Conclude
 
 \subsection{Offline Calibration}
 To compute the angle of arrival, it is critical that the input signal be coherent in both amplitude and phase.
@@ -355,17 +348,44 @@ so no further transformations are required to obtain an image with square pixels
     \caption{Backprojection image generated from real data}
     \label{fig:bp_testimg}
 \end{figure}
-\autoref{fig:bp_testimg} shows the resulting image with and without calibration.
+In \autoref{fig:bp_testimg}, the resulting images obtained with and without calibration are compared.
+Calibration demonstrates several notable effects:
+Calibration leads to an enhanced SNR and a reduction in the width of azimuth peaks.
+Additionally, the influence of antenna gain patterns becomes apparent,
+causing attenuation in off-center regions and for longer distances.
+As predicted in the previous section,
+the direction of arrival estimation is not perfect, even for ideally calibrated data.
+Each peak is accompanied by a circular artifact at the same range, concentric to the sensor.
 
-- calibration causes...:
+Compared to FFT imaging, the noise attenuation appears to have improved for both images.
+This expected, since the FFT-approach only uses 86 out of the 192 available channels,
+while backprojection uses all of them.
+This should lead to up to double the noise attenuation,
+as the following brief detour into estimation theory will explain.
 
-- improved SNR
+Doubling the number of samples in the presence of any additive zero-mean noise
+can lead to a halving of the noise variance due to the properties of the sample mean estimator
+and the central limit theorem. 
+The sample mean estimator is given by:
 
-- narrower peaks in azimuth
+\begin{align}
+\hat{\mu} = \frac{1}{N} \sum_{i=1}^{N} x_i    
+\end{align}
 
-- concentric semicircles still visible
+where $ x_i $ are the individual samples and $ N $ is the number of samples.
+The variance of the sample mean estimator is given by:
 
-- antenna gain pattern results in attenuation at the edges and for high distances
+\begin{align}
+\text{Var}(\hat{\mu}) = \frac{\sigma^2}{N}    
+\end{align}
+
+where $ \sigma^2 $ is the variance of the noise.
+
+Therefore, as the number of samples $ N $ increases,
+the variance of the sample mean estimator decreases proportionally to $ \frac{1}{N}$.
+Hence, doubling the number of samples effectively halves the noise variance,
+resulting in a more accurate estimate of the true value.
+
 
 - use locational calibration for test image
 
@@ -429,8 +449,74 @@ and the sensor located on one of the image's long sides, namely $[x,y] = [0,0]$m
 The resulting images looks very similar to those generated by the pure backprojection algorithm.
 
 \section{Conclusion}
+In this chapter, we embarked on a comprehensive exploration of radar imaging algorithms, 
+evaluating their performance and efficacy in extracting meaningful information from radar data.
+Leveraging the insights gained from stability analysis and antenna gain measurements conducted in previous sections,
+we conducted a detailed examination of FFT-based imaging, Backprojection, and a hybrid approach.
+Through a systematic comparison of the resulting images and analysis of key metrics such as the azimuth and elevation peak widths,
+we gained a deeper understanding of the capabilities of each algorithm.
 
+A comparison of the three implemented algorithms is given in \autoref{tab:imaging_comp}.
+To start, the theoretically achieveable half-power beamwidths are compared.
+In azimuth, the backprojection-based algorithm fair slightly better than the FFT, reaching \SI{1.6}{\degree} instead of \SI{1.9}{\degree}.
+In elevation, he approach for FFT-based DOA estimation can achieve a lower HPBW (\SI{12}{\degree}) than backprojection (\SI{20}{\degree})
+if an appropriate vertical sub-array is selected.
+Note however that these vertical sub-arrays only consist of a maximum of four antennas,
+while the backprojection based DOA estimation always uses the entire array, resulting in a higher SNR.
+This effect is also seen in the SNR of the test images,
+where the backprojection approaches achieve an SNR of asdf for calibrated data, 
+while the FFT only reaches asdf.
+For backprojection, a trade-off between the SNR improvement and the elevation HPBW can be made, 
+where elevation channels are given greater weight in the calculation.
 
+Another advantage of the backprojection algorithms is the reduced distortion in the near-field of the array,
+by essentially re-focusing it onto every point in the target image.
+One could argue that this reduces the Frauenhofer distance of the array to that of a single antenna with
+$D_{ant}=$ \SI{11}{\mm}.
+
+The obvious disadvantage of backprojection is its complexity and runtime.
+Even for a fairly low-resolution image, it takes around asdf seconds per frame, making it unfeasible for real-time applications.
+The hybrid approach works substantially better, achieving adsf per frame, showing some real-time capabilities with further optimization.
+The FFT-based approach remains the fastest, averaging asdf per frame.
+
+\begin{table}
+    \begin{tabular}{llll}
+        \hline
+        & \textbf{FFT} & \textbf{Backprojection} & \textbf{Hybrid} \\
+        \hline
+        azimuth HPBW& \SI{1.9}{\degree} & \SI{1.6}{\degree} & \SI{1.6}{\degree} \\
+        elevation HPBW & \SIrange{12}{60}{\degree} & \SI{20}{\degree} & \SI{20}{\degree} \\
+        Frauenhofer Distance & \SI{14.50}{\m} & \SI{63.7}{\mm} & \SI{63.7}{\mm} \\
+        complexity & $\mathcal O (MK \log MK)$ & $\mathcal O(ZM^2K)$ & $\mathcal O \left(K(Z + M\log M) \right)$ \\
+        test image runtime\footnote{
+            the runtime to compute the $240 \times 150$ pixel
+            image.
+            calculated by running the respective 
+            PyTorch implementation for 1000 times and taking the average.
+            The time needed to transform the FFT-approach's output into cartesian coordinates was not considered.
+            Hardware: 
+        } & \SI{100}{\ms} & \SI{54}{\s} & \SI{120}{\ms} \\
+        test image SNR &&& \\
+        input specifications & ULA or URA & - & - \\
+        output specifications & spherical & - & - \\
+    \end{tabular}
+    \caption{Comparison between the three implemented algorithms}
+    \ref{tab:imaging_comp}
+\end{table}
+
+In conclusion, the backprojection offers significant potential for improvements in image fidelity over the FFT-approach.
+The near-field degradation of the DOA estimation is resolved and the potential SNR was increased.
+It offers arbitrary flexibility in the image's shape,
+a more robust DOA estimation in elevation and the application of measured antenna gains.
+While pure backprojection has prohibitively high runtimes,
+the hybrid approach demonstrates comparable performance to the FFT,
+suggesting potential for real-time capability with some optimization.
+
+Further research is required to understand how the algorithm's performance can be enhanced
+by non-uniformly weighing the input data. In the FFT-based approach,
+a regular window function could be used to enhance the shape of the peak in range and reduce its side-lobe level.
+DOA-estimation could also be improved, especially in elevation,
+by sacrificing some SNR gain for an enhanced HBPW by optimizing the weights for diversity.
 
 % 28.2.: theory
 % 29.2.: stability

@@ -1,1 +1,117 @@
-\chapter{Conclusions}
+\chapter{Conclusion and Discussion}
+
+In this final chapter, we reflect on the journey undertaken throughout this thesis,
+drawing together the threads of our research and exploring their broader significance.
+From the initial exploration of radar imaging algorithms to the in-depth analysis of their performance,
+each step has brought us closer to a deeper understanding of radar technology and its applications.
+
+\section{Overview}
+\autoref{ch:intro} of this thesis delineated two overarching objectives
+aimed at advancing radar imaging technology. Firstly, it sought to identify 
+and evaluate a novel imaging algorithm capable of surpassing the limitations inherent
+in the current FFT-based approach developed for the system under test. Specifically, 
+the chapter aspired to develop an algorithm harnessing measured antenna gains to 
+enhance imaging precision and fidelity significantly. 
+Secondly, the introduction provided a comprehensive overview of radar technology's pivotal role,
+particularly within the domain of mining applications. Through elucidating radar's pivotal role 
+in streamlining bulk logistics and bolstering security measures,
+the chapter underscored the multifaceted applications of radar technology.
+% Additionally, the chapter recognized the inherent variability in radar research due to hardware discrepancies and outlined the thesis's broader implications for advancing FMCW MIMO radar imaging technology.
+These advancements hold promise for transformative applications across remote sensing,
+autonomous vehicles, and surveillance.
+\\
+In \autoref{ch:fundamentals}, foundational concepts essential for 
+radar technology and imaging algorithms were explored. 
+The chapter began with Antenna Fundamentals, introducing key parameters.
+It then provided a detailed framework in the Signal Model section,
+laying the groundwork for understanding signal processing in FMCW MIMO radar imaging 
+and setting the stage for discussions on imaging algorithms, including the versatile Backprojection technique.
+\\
+The hardware evaluation in \autoref{ch:hardware} delved into the meticulous examination
+of the iMCR sensor, assessing its stability and performance under various conditions.
+Through systematic measurements and analysis, the chapter provided valuable insights 
+into the reliability and functionality of the hardware components,
+as well as the applicability of the proposed imaging algorithms.
+\\
+Embarking on a comprehensive exploration of radar imaging algorithms in \autoref{ch:imaging},
+we evaluated their performance and efficacy in extracting meaningful information from radar data.
+Leveraging the insights gained from stability analysis and antenna gain measurements
+conducted in previous sections, a detailed examination of FFT-based imaging,
+Backprojection, and a hybrid approach was conducted.
+Through a systematic comparison of the resulting images and analysis of key metrics
+such as the azimuth and elevation peak widths, a deeper understanding of the capabilities
+of each algorithm was obtained.
+
+\section{Key Findings}
+This section encapsulates the pivotal discoveries extracted from both the hardware evaluation and imaging exploration.
+In Chapter 3, the thesis rigorously examines the stability and antenna characteristics of the radar hardware,
+uncovering fundamental insights crucial for radar imaging. These insights are complemented by the findings from Chapter 4,
+which delve into the performance and efficacy of various radar imaging algorithms. 
+
+The stability analysis of the radar system revealed consistent performance over time,
+with gradual changes observed in system parameters such as temperature and runtime.
+Frequent recalibrations were identified as essential for maintaining optimal system performance.
+
+Antenna gain measurements provided valuable insights into the signal model's accuracy,
+confirming the feasibility of extracting antenna characteristics even from imperfect measurements.
+
+Putting the imaging algorithms to the test revealed that,
+while the FFT-based approach offers the fastest runtime, Backprojection shows promising potential
+for improved image fidelity, particularly in reducing distortion in the near-field
+and enhancing signal-to-noise ratio (SNR). Furthermore, the hybrid approach demonstrates
+comparable performance to the FFT, suggesting real-time capability with further optimization.
+These results underscore the importance of selecting the appropriate imaging algorithm based
+on specific application requirements, balancing considerations such as runtime efficiency
+and image quality.
+
+\section{Outlook and Discussion}
+
+Concluding our investigation into real-time capable calibration and image reconstruction techniques for FMCW MIMO radars,
+it's essential to reflect on the significant insights garnered and explore avenues for future research.
+In this section, we discuss the implications of our findings, potential areas for improvement,
+and outline future directions in the field.
+\\
+
+Exploring the stability of our experimental setup reveals subtle yet impactful influences on radar performance.
+Minor variations in temperature and humidity levels cause nuanced shifts within the system, 
+gradually affecting measurement accuracy over time.
+Minimizing these environmental dynamics is crucial for better understanding the systems stability.
+
+Further investigation into self-calibration mechanisms within the radar frontend would also improve our understanding of system stability.
+While designed to maintain system integrity, the inner workings of self-calibration remain somewhat opaque.
+Clarifying its duration, mechanisms, and effectiveness is an essential next step.
+
+Temperature regulation emerges as another critical consideration for the stability measurements.
+Exploring controlled cooling measures, such as strategic cooler spray application, 
+promises to highlight temperature-induced distortions in radar measurements.
+By observing corresponding changes in phase stability, 
+researchers can develop robust temperature compensation strategies, 
+ensuring consistent radar performance across diverse environments.
+
+\\
+In antenna gain measurements, integrating an external reference antenna
+holds promise for enhancing measurement accuracy and precision.
+This approach enables absolute measurements, elevating the reliability of antenna characterization processes.
+
+Meanwhile, exploring different radome configurations offers insights into fine-tuning antenna performance, 
+vital for optimizing performance in dynamic environmental conditions.
+
+\\
+Shifting focus to imaging algorithms, bridging the conceptual gap between FFT-based imaging and 
+backprojection techniques presents exciting opportunities.
+Adapting windowing concepts from FFT-based imaging to backprojection could enhance image accuracy and fidelity.
+Also, to enhance the DOA capabilities of the backprojection algorithm,
+the array's diversity can be improved through appropriate windowing.
+
+Implementing adaptive sampling techniques in image reconstruction offers promise for optimizing
+computational resources and enhancing real-time imaging capabilities.
+Regions of interest can be identified from low-resolution images,
+making it possible to adaptively increase the resolution only where it matters.
+\\
+
+In summary, proposed improvements in stability analysis,
+antenna gain measurements, and imaging algorithms represent significant strides in improving imaging for FMCW MIMO radar systems.
+By embracing a culture of continuous improvement and fostering curiosity-driven research, 
+researchers are poised to propel radar technology forward,
+driving incremental advancements that collectively revolutionize radar applications across diverse domains.
+

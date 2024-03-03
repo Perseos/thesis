@@ -1,4 +1,5 @@
 \chapter{Radar Fundamentals: Theoretical Background}
+\label{ch:fundamentals}
 This section provides a foundation for understanding the principles and methodologies underpinning FMCW MIMO radar imaging.
 We begin by elucidating the signal model employed in FMCW radar systems,
 elucidating the distinctions between single-channel and MIMO configurations.
@@ -530,10 +531,11 @@ The total runtime comes out to:
 
 Backprojection's runtime scales linearly with the target resolution of the image.
 If the target image consists of $Z$ different voxels,
-then for each voxel, $M\times K$ weights are calculated, applied to the data, and the result is summed up (taking $(M-1) \times (K-1)$ operations).
+then for each voxel,$K$ channels worth of $M$ weights each are calculated, and each applied to the $M$ samples of that channel.
+The results are then summed up resulting in the amplitude of each voxel.
 The overall runtime is:
 \begin{align}
-    Z \left(\left(\mathcal O(MK) + \mathcal O(MK) + \mathcal O((M-1)(K-1))\right)\right) = \mathcal O(ZMK)
+    Z \left(\left(\mathcal O(MK) + \mathcal O(M^2K) + \mathcal O((M-1)(K-1))\right)\right) = \mathcal O(ZM^2K)
 \end{align}
 It can be improved by the aforementioned hybrid approach:
 For each of the $K$ channels, one $M$-point FFT is calculated,
