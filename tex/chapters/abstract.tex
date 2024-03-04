@@ -1,8 +1,13 @@
 \begin{titlepage}
+    \begin{tikzpicture}[remember picture,overlay]
+        \node[anchor=north east,inner sep=1cm] at (current page.north east)
+        {\includegraphics[width=0.8\textwidth]{../figures/IHF-Logo_platzhalter.png}};
+    \end{tikzpicture}
+    % \hfill\includegraphics[width=0.5\textwidth]{../figures/IHF-Logo_platzhalter.png}
     \begin{center}
-        \vspace*{1cm}
+        \vfill
 
-        \huge
+        \Huge
         \textbf{Calibration and Image Reconstruction Techniques
             for FMCW MIMO Radars with Consideration of Antenna Radiation Patterns}
         \vspace{0.5cm}
@@ -11,24 +16,25 @@
         Kalibrations- und Bildrekonstruktionsverfahren für FMCW-MIMO-Radare unter Berücksichtigung der Antennenabstrahlungscharakteristik
         \vspace{1.5cm}
 
-        \textbf{Daniel Gotzens}
+        Master thesis presented by \\
+        \textbf{Daniel Gotzens} \\
+        Matr.-Nr. 359276
 
         \vfill
 
         \normalsize
-        Masterarbeit vorgelegt dem \\
+        Submitted to the Institute of High Frequency Technology \\
+        RWTH Aachen University,
+        \today\\
+        \vfill
 
-        \vspace{0.8cm}
-
-        \includegraphics[width=4cm]{../figures/IHF-Logo_platzhalter.png}
-
-        Lehrstuhl für Radarsystemtechnik \\
-        Institut für Hochfrequenztechnik \\
-        RWTH Aachen University\\
-        \today
+        Supervised by: \\
+        \large
+        Prof. Dr.-Ing. Peter Knott \\
+        M. Sc. Benedikt Eliasson \\
 
         \vspace{1cm}
-        In Kooperation mit \\
+        In cooperation with \\
 
         \includegraphics[height=18pt]{../figures/indurad-logo.png}
 
@@ -37,12 +43,20 @@
 
     \end{center}
 \end{titlepage}
+\afterpage{\null\newpage}
 
-\begin{abstract}
-    Increased image quality can be achieved by implementing backprojection on a millimeter-wave TDM FMCW MIMO Radar.
-    In this thesis, a backprojection-based imaging algorithm is proposed and implemented for a radar sensor.
-    This radar sensor's functionality is tested, the sensor is calibrated,
-    and then the algorithm is compared to the current FFT-based algorithm as well as MUSIC.
-    It is found that near-field accuracy of the image generated with backprojection and MUSIC is increased,
-    and that real-time capability can only be guaranteed for backprojection and the current FFT-based approach.
-\end{abstract}
+\subsubsection*{Abstract}
+In recent years, FMCW MIMO radars have emerged as highly effective solutions for short-- to medium-range,
+high-resolution imaging radar applications. Traditional imaging algorithms rely on the Fast Fourier Transform (FFT),
+facilitating real-time processing of radar data to accommodate the high data rates of FMCW MIMO radars.
+However, these algorithms exhibit limited flexibility concerning both the shape of the output image and the composition of the input data.
+In practical scenarios, this constraint can result in radar image distortion due to near-field effects and antenna gain variations across the array.
+
+This thesis proposes and implements a backprojection-based imaging algorithm for a TDM FMCW MIMO radar operating in the mmWave frequency band.
+The thesis evaluates the functionality and stability of the radar sensor, measures its antenna gains, and utilizes them to calibrate the input data.
+Subsequently, the implemented algorithm is compared with FFT-based and hybrid approaches.
+The hybrid approach combines range estimation using the FFT with direction-of-arrival estimation using backprojection.
+
+The findings reveal that, in comparison to conventional FFT-based algorithms,
+backprojection offers the potential for achieving higher image fidelities,
+particularly in terms of near-field direction-of-arrival accuracy and signal-to-noise ratio.

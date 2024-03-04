@@ -3,7 +3,7 @@
 \label{sec:stability_analysis}
 
 The imaging algorithms introduced in the previous chapter all rely on a radar system with constant characteristics.
-We begin by discussing the physical setup of the experiment, outlining the equipment used and the experimental conditions. 
+We begin by discussing the physical setup of the experiment, outlining the equipment used and the experimental conditions.
 
 Additionally, we discuss the preprocessing steps and define the quantities analyzed to assess system stability accurately.
 These steps are essential for mitigating noise and ensuring the integrity of the data used for stability analysis.
@@ -18,29 +18,29 @@ can affect signal reception and transmission, influencing the system's overall s
 and thereby impacting the imaging fidelity.
 
 
-
-\subsection{Setup}
-
-The experiment conducted to explore the stability of the sensor consists of setting it up
-in a low-reflection environment and placing a corner reflector 
-at boresight in front of the sensor at a distance of roughly \SI{1}{\m} (cf. \ref{fig:photo_setup}).
-
-\begin{figure}
+\begin{figure}[h]
     \centering
-    \includegraphics[width=0.6\textwidth]{../figures/aufbau1.jpg}
+    \includegraphics[width=0.8\textwidth]{../figures/aufbau1.jpg}
     \caption{Measurement Setup}
     \label{fig:photo_setup}
 \end{figure}
 
-A measurement at relatively short range is preferable because the signal level is higher, 
-reducing the impact of noise. The time data collected in all channels is recorded every minute, 
-and the temperature readings of the sensor's CPU, FPGA and radar frontend 
+\subsection{Setup}
+
+The experiment conducted to explore the stability of the sensor consists of setting it up
+in a low-reflection environment and placing a corner reflector
+at boresight in front of the sensor at a distance of roughly \SI{1}{\m} (cf. \ref{fig:photo_setup}).
+
+A measurement at relatively short range is preferable because the signal level is higher,
+reducing the impact of noise. The time data collected in all channels is recorded every minute,
+and the temperature readings of the sensor's CPU, FPGA and radar frontend
 are also recorded every minute (cf. \ref{fig:act_temp}).
 
 Due to the static geometry of the setup, the runtime of each transmitted wavefront should be identical.
 Thus, the ideal deramped signal should be of a single, constant frequency and without inter-channel phase differences.
-For analysis, system runtime and temperature cannot be considered independent variables, as illustrated in \autoref{fig:exp_temp}:
-The system starts at ambient temperature, heating up and approaching a stable operating temperature on turning on ($t_0$), and cooling back down after turning off ($t_1$).
+For analysis, system runtime and temperature cannot be considered independent variables, as illustrated in \cref{fig:exp_temp}:
+The system starts at ambient temperature, heating up and approaching a stable operating temperature on turning on ($t_0$),
+and cooling back down after turning off ($t_1$).
 
 \begin{figure}
     \begin{subfigure}[t]{0.45\textwidth}
@@ -58,26 +58,11 @@ The system starts at ambient temperature, heating up and approaching a stable op
     \caption{Time Evolution of the Radar System's Temperature}
 \end{figure}
 
-
 In practice, the spectral peak caused by the reflector will also have a certain bandwidth,
 and other peaks at higher and lower frequencies will be present due to incomplete shielding and/or unwanted reflections.
 Also, the reflector peak may wander if the setup geometry moves.
 
-\subsection{Preprocessing and Analysis}
-The primary objective of this experiment is to determine whether the system characteristics remain constant over time. 
-This objective can be distilled into an examination of the channel gains $\underline C_k$.
-Because of the aforementioned imperfections in the experiment, some preprocessing is required to analize the systematic offsets present in the radar signal.
-Multiple additional peaks in the spectrum are visible in \autoref{fig:avg_intensity}.
-It is therefore prudent to limit the analysis to only the FFT-bin at the maximum of the peak caused by the reflector.
-In theory, this FFT-bin should contain the exact channel gain (see also \autoref{eq:y_fft}):
-\begin{align}
-    \hat{\underline{C}}_k[l] = \left.\mathcal{F}\{ y_k[m;l]\}\right|_{\Omega=\hat \Omega[l]} \\
-    \text{with } \hat\Omega[l] = \arg \underset{subscript}{argument}\max |\mathcal{F}\{ y_k[m;l]\}
-\end{align}
-In practice, the measurement environment exhibits some minor changes, for example in temperature and humidity, 
-which can result in the geometry to shift by up to a few millimeters.
-This shows by the spectral maximum shifting over time, as seen in \autoref{fig:refldist}.
-\begin{figure}
+\begin{figure}[h]
     \centering
     \begin{subfigure}[t]{.45\textwidth}
         \centering
@@ -98,82 +83,115 @@ This shows by the spectral maximum shifting over time, as seen in \autoref{fig:r
     \caption{Change in reflector distance as measured by iMCR}
     \label{fig:refldist}
 \end{figure}
+\subsection{Preprocessing and Analysis}
+The primary objective of this experiment is to determine whether the system characteristics remain constant over time.
+This objective can be distilled into an examination of the channel gains $\underline C_k$.
+Because of the aforementioned imperfections in the experiment, some preprocessing is required to analize the systematic offsets present in the radar signal.
+Multiple additional peaks in the spectrum are visible in \cref{fig:avg_intensity}.
+It is therefore prudent to limit the analysis to only the FFT-bin at the maximum of the peak caused by the reflector.
+In theory, this FFT-bin should contain the exact channel gain (see also \cref{eq:y_fft}):
+\begin{align}
+    \hat{\underline{C}}_k[l] = \left.\mathcal{F}\{ y_k[m;l]\}\right|_{\Omega=\hat \Omega[l]} \\
+    \text{with } \hat\Omega[l] = \arg \underset{\Omega}{\max}
+    \left|\mathcal{F}\{ y_k[m;l]\}(\Omega)\right|
+\end{align}
+
+
+In practice, the measurement environment exhibits some minor changes, for example in temperature and humidity,
+which can result in the geometry to shift by up to a few millimeters.
+This shows by the spectral maximum shifting over time, as seen in \cref{fig:refldist}.
+
 
 The main metric used to assess the stability of the channel gains in the following analysis
-will be the complex ratio of the maximum FFT-bin in range to its initial value:
+will be the \emph{channel gain drift} $\underline D$, defined as the complex ratio of the maximum FFT-bin in range to its initial value:
 \begin{align}
-    \frac{\underline{\hat C}_k[l]}{\underline{\hat C}_k[0]} 
-    &= \frac{\mathcal{F}\{y_{k}[m;l]\}(\hat\Omega)}{\mathcal{F}\{y_{k}[m;0]\}(\hat\Omega)} \\
-    \text{with } \hat\Omega &= \arg \underset{\Omega}{argument}
+    \underline D_k[l] = \frac{\underline{\hat C}_k[l]}{\underline{\hat C}_k[0]}
+    = \frac{\mathcal{F}\{y_{k}[m;l]\}(\hat\Omega)}{\mathcal{F}\{y_{k}[m;0]\}(\hat\Omega)}
 \end{align}
 Using a logarithmic representation of this ratio,
-it can be represented in terms of a level difference in \unit{\dBr} and a phase difference in \unit{\degree}.
+it can be represented in terms of a level difference in \unit{\dBr} and a phase difference in degrees.
 
+\newpage
 \subsection{Effects of System Temperature and Runtime}
 
 Multiple measurements have indicated that, while the amplitude rarely varies by more than \SI{1}{\decibel},
 the phase is not as stable over time.
-Typically, the mean phase drifts by up to \SI{50}{\degree} in the hours after system startup,
+For example in \cref{fig:weekend}, the mean phase drifts by up to \SI{50}{\degree} in the hours after system startup,
 with the rate of change reducing after around four hours.
 However, it has to be noted that there is no clear correlation between phase drift and temperature:
 the phase continues to drift after the system temperature stabilizes;
 the reduction in drift only occurs hours after the system has reached a stable temperature of approximately \SI{60}{\celsius}.
-
 \begin{figure}
     \centering
-    \includegraphics[width=\textwidth]{../figures/meas_24-02-16_phase_drift.pdf}
+    \includegraphics[width=\textwidth]{../figures/meas_23-10-09_phase_drift.pdf}
     \caption{Recorded drift over night}
     \label{fig:weekend}
 \end{figure}
-TODO : split new measurement into heating up (23:00-8:00) and stable (13:00-12:00).
 
 
-\subsection{Effects of Self-Calibration}
-As described in \autoref{sec:imcr}, the AWR2243P-chips undergo a self-calibration upon initialization.
-This initialization can be triggered by either restarting the entire system 
-or by re-writing the configuration registers on the radar chips.
-Indeed, this initial calibration can be observed in the data (cf. \ref{fig:restart}).
-After the connection with the radar has been re-established, the following effects are visible:
-\begin{itemize}
-    \item slightly increased level: the level in each channel increases by approximately \SI{0.3}{\decibel}
-    \item increased incoherence: after the first restart of the system, the drift in both level and phase is distributed more broadly
-    \item mean phase: the mean phase drift changes by up to \SI{5}{\degree}
-\end{itemize}
 
-\begin{figure}
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth]{../figures/antenna_drift.pdf}
+    \caption{Drift by Antenna}
+    \label{fig:antenna_drift}
+\end{figure}
+
+\begin{figure}[bh]
     \centering
     \includegraphics[width=\textwidth]{../figures/meas_23-10-30_reboots_phase_drift.pdf}
     \caption{Recorded drift and temperature with system restart}
     \label{fig:restart}
 \end{figure}
 
-TODO: graph jumps to new phase before reboot. confirm or fix.
-
-TODO: quantify amount of discontinuity
-
-
-\subsection{Antenna Separation}
-The channel drifts can be separated into 
-\begin{figure}
-    \centering
-    \includegraphics[options]{../../antenna_drif}
-\end{figure}
+\newpage
 \subsection{Differences between Antennas}
-TODO: Plots, antenna Separation
+To further investigate the time evolution of the channel gain drifts,
+their impact can be described in terms of relative antenna gains.
+As stated in \cref{eq:channel_gain}f., each the squared gain of a channel $k$
+is proportional to the gains of the two antennas $i$ and $j$ that make up the channel.
+That is,
+\begin{align*}
+    \underline D_k^2 = \frac{\underline{\hat C}^2_k[l]}{\underline{\hat C}^2_k[0]}
+    = \frac{\underline G_{Tx,i}[l]}{\underline G_{Tx,i}[0]}
+    \frac{\underline G_{Rx,j}[l]}{\underline G_{Rx,j}[0]}
+\end{align*}
+Defining Rx antenna 0 as a reference, i.e.\ $\underline G_{Rx,0}[l] = 1$ leads to a simple way of extracting the Tx antenna gain drift:
+\begin{align*}
+    \frac{\underline G_{Tx,i}[l]}{\underline G_{Tx,i}[0]} = \left.\underline{\hat D}^2_k[l]\right|_{k=N_{Tx}i}
+\end{align*}
+With knowledge of that parameter, the Rx antenna drifts can be estimated using the remaining drift measurements: \\
+\begin{align*}
+    \frac{\underline G_{Rx,j}[l]}{\underline G_{Rx,j}[0]}
+    \approx \frac{1}{N_{Tx}}\sum_{i=0}^{N_{Tx}-1} \left.D_k^2[l] \right|_{k=N_{Tx}i}
+    \cdot \left(\frac{\underline G_{Tx,i}[l]}{\underline G_{Tx,i}[0]}\right)^{-1}
+\end{align*}
+The results of this are shown in \ref{fig:antenna_drift}.
 
-Comparing the amplitude recorded by all antenna pairs, no channel in particular stands out [PLOT NEEDED].
-When looking at the different channels phase drifts, it can be seen that the array becomes less coherent over time.
-The distribution of phase shift across channels seems roughly gaussian [PLOT NEEDED], with increasing variance over time.
-No antenna pair seems more prone to incoherence than the rest:
-across measurements, the maximum outlier (in terms of divergence from the mean phase) cannot be associated with a chip or antenna.
+It can be seen that all antenna gains drift from their initial value by a similar amount.
+They tend to be similar in amplitude and phase to other antennas on the same chip.
+The effects of interference events, such as the \SI{1}{\mm} shift at around 18:30 (c.f.~\ref{fig:refldist}),
+may differ between the antennas.
+
+\subsection{Effects of Self-Calibration}
+As described in \cref{sec:imcr}, the AWR2243P-chips undergo a self-calibration upon initialization.
+This initialization can be triggered by either restarting the entire system
+or by re-writing the configuration registers on the radar chips.
+Indeed, this initial calibration can be observed in the data (cf. \ref{fig:restart}).
+After the initial system restart, there is an escalation in incoherence,
+manifesting in a broader distribution of drift in both level and phase.
+The level in each channel experiences a slight increase, with an approximate rise of \SI{0.3}{\decibel}.
+Additionally, the mean phase drift undergoes alterations of up to \SI{5}{\degree}.
+
+
 
 \subsection{Conclusion}
 The systematic offsets of the system are now better described.
 While the amplitude of the measured signal is relatively stable, the phase is affected more strongly.
 All channels' phases drift from both their initial value and each other over time.
-It has also be shown that restarting the radar frontend has an effect on the phase, 
+It has also be shown that restarting the radar frontend has an effect on the phase,
 since the frontend undergoes an automatic calibration each time.
-No clear bias within the array has been found, seeing that across multiple measurements, 
+No clear bias within the array has been found, seeing that across multiple measurements,
 all channels seem to be affected similarly.
 
 Overall, it has been demonstrated that the radar system cannot be considered ideal and
@@ -186,4 +204,6 @@ Because the phase and amplitude offsets are affected by the automatic calibratio
 this calibration should ideally be repeated on every startup, ideally letting the system temperature stabilize.
 
 An advantage for the offline calibration is that the speed at which the array incoherence grows is limited.
-That means that for sufficiently short runtimes, it can be assumed to be static, and therefor, an offline calibration to be sufficient.
+That means that for sufficiently short runtimes, it can be assumed to be static.
+Therefore, an offline calibration will be sufficient as long as they are undertaken frequently enough.
+\afterpage{\null\newpage}

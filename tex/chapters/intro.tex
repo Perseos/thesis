@@ -1,5 +1,6 @@
 \chapter{Introduction}
 \label{ch:intro}
+
 Radar technology has undergone significant advancements over the decades,
 revolutionizing various fields including aerospace, defense, automotive, and healthcare.
 Its fundamental principle of using electromagnetic waves to detect the presence,
@@ -11,7 +12,7 @@ as a cutting-edge solution with unparalleled capabilities.
 FMCW radar, characterized by its continuous transmission of frequency-modulated signals,
 combined with MIMO architecture, which utilizes multiple antennas for both transmission and reception,
 has enabled enhanced spatial resolution, improved target detection, and increased resilience to interference.
-Operating in the mmWave spectrum, typically within the frequency range of 24 to 100 GHz,
+Operating in the mmWave spectrum, typically within the frequency range of \SIrange{24}{100}{\GHz},
 these radars offer advantages such as high resolution, immunity to environmental conditions
 like fog and precipitation, and the ability to accommodate large bandwidths for high data rates.
 
@@ -97,21 +98,20 @@ paving the way for improved performance and expanded applications in various dom
 
 \section{Thesis Outline}
 In this thesis, we embark on a comprehensive exploration of advanced imaging techniques for FMCW MIMO radar systems,
-aiming to address existing challenges and enhance imaging performance.
+aiming to address existing challenges and enhance imaging performance.\\
 
-Chapter 1 provides a thorough examination of
-the theoretical background underpinning radar imaging, including signal models and a detailed description of the image reconstruction methods.
+\Cref{ch:fundamentals} provides a detailed examination of
+the theoretical background underpinning radar imaging,
+including signal models, technical parameters of antennas, and a detailed description of the image reconstruction methods.
 We delve into the intricacies of both FFT-based and proposed back projection algorithms.
-Furthermore, a detailed hardware description of the FMCW MIMO radar system under investigation is presented,
-laying the foundation for subsequent experimental chapters.
-
-Chapter 2 focuses on measurements and validation of hardware stability
-through extensive static measurements. Through rigorous analysis, we assess the stability of the radar system and measure antenna gains,
+\Cref{ch:hardware} gives a thorough hardware description of the FMCW MIMO radar system under investigation,
+and describes the experiments conducted to further evaluate the hardware.
+Through these experiments, we both assess the stability of the radar system and measure antenna gains,
 crucial for accurate imaging.
-
-Chapter 3 shifts the focus to imaging algorithms, detailing the implementation of the back projection algorithm using PyTorch.
-Additionally, we discuss the interpolation of measured gains and evaluate the performance enhancements achieved through these refinements.
-
-By presenting comprehensive results and analyses, this thesis aims to contribute to the advancement of FMCW MIMO radar imaging technology,
-with implications for various applications in fields such as remote sensing, autonomous vehicles, and surveillance.
+\Cref{ch:imaging} shifts the focus to imaging algorithms,
+detailing the implementation of the back projection algorithm using PyTorch.
+The algorithm is compared to the conventional FFT-based approach and a hybrid approach,
+focusing on the DOA estimation accuracy and the quality of a test image.
+\Cref{ch:conclusion} concludes the thesis by presenting the key findings, discussing their implications
+and giving an outlook on future research.
 

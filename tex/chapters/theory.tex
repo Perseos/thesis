@@ -64,8 +64,6 @@ while all others are called \emph{minor lobes}.
 Minor lobes can be further broken down into \emph{side lobes} and \emph{back lobes},
 where the back lobe faces in the exact opposite direction of the main lobe,
 and \emph{side lobes} usually directly next to it.
-    [Figure asdf shows a qualitative example of a radiation pattern,
-        designating one of each type of lobe].
 
 An important measure of a radiation pattern is its half-power beamwidth (HPBW).
 It corresponds to the angle between the two points
@@ -170,7 +168,7 @@ The continuous wave signal $x_{TX}(t)$ send by the transmit antenna
 is reflected by an ideal point scatterer at position $\vec r_S$
 and then received at the receive antenna as $x_{RX}(t)$.
 
-Linear sawtooth frequency modulation is a popular type of high-bandwidth FMCW \cite{jankiraman}.
+Linear sawtooth frequency modulation is a popular type of FMCW \cite{jankiraman}.
 The signal's frequency is modualted with a sawtooth of period $T_{chirp}$.
 Within one period, i.e.\ $t \in [0, T_{chirp}]$,
 the electric signal of amplitude $A_0$\footnote{
@@ -213,20 +211,20 @@ With that, the amplitude at the receiver can be expressed as
               & = A_0C(\vec r_S) e^{j\left(\omega_0(t-\tau) + \frac{1}{2}\dot \omega (t-\tau)^2 + \phi_0\right)}
 \end{align}
 
-The received signal is then mixed with a copy of the transmitted signal (\ref{eqn:x_TX})
+The received signal is then mixed with a copy of the transmitted signal (\ref{eq:x_TX})
 and a band-pass filter is applied that removes undesirable frequencies.
 The resulting signal $y(t)$ is called \textit{intermittent frequency} signal.
 \begin{align}
-    y(t) & = \text{BP} \left\{ x_{RX}(t) \cdot x_{TX}(t) \right\}                        \\
+    y(t) & = \text{BP} \left\{ x_{RX}(t) \cdot x_{TX}(t) \right\}                       \\
          & = \text{BP} \left\{
     A_0 e^{j(\omega_0t + \frac{1}{2}\dot \omega t^2) }
     \cdot A_0C(\vec r_S) e^{j(\omega_0(t-\tau) + \frac{1}{2}\dot \omega (t-\tau)^2) }
-    \right\}                                                                             \\
+    \right\}                                                                            \\
          & = A_0^2C(\vec r_S)
     e^{j(\frac{1}{2}\dot\omega\tau^2- \omega_0\tau)}
     \cdot  \text{BP} \left\{
     e^{j(2\omega_0 t + \frac{1}{2}\dot\omega t^2 - \dot\omega\tau t)}
-    \right\}                                                                             \\
+    \right\}                                                                            \\
          & \approx C(\vec r_S)e^{-j\omega_0\tau} e^{-j\dot\omega\tau t} \label{eq:y_IF}
 \end{align}
 From this, the complex channel gain\footnote{
@@ -267,26 +265,7 @@ where all processing can be done at the intermittent frequency range.
 Depending on the application, a compromise has to be found between the advantages and drawbacks of each method.
 There are also methods available that combine aspects of these three basic paradigms, such as OFDM and Hadamard-Coding.[citation needed] \\
 
-\subsection{Virtual Antenna Arrays}
-An important concept in analizing MIMO arrays is that of the \emph{virtual antenna array}:
-in a nutshell, the idea is to express the $N_{TX} \times N_{RX}$ MIMO array as an equivalent $1\times K$ SIMO array.
-The procedure to construct the corresponding virtual array for a given MIMO array is as follows:
-
-The transmit antenna associated with channel $k=0$ is placed in the origin of the virtual array's coordinate system.
-Then, $K$ receive antennas are placed such that the displacement between them and the transmit antenna
-is the same as it was between the original MIMO array's corresponds transmit and receive antenna.
-It is possible for virtual antennas to overlap.
-As we will see later, the input signal under far-field conditions only depends
-on the relative displacement between the Tx- and Rx-antennas of a channel, and not their absolute positions.
-
-An example MIMO array and its corresponding virtual array can be seen in figures a and b, respectively.
-The numbering convention for channel index $k$ corresponding to transmit antenna $i$ and receive antenna $j$,
-that is also used throughout the thesis is as follows:
-\begin{align}
-    k = N_{Tx}i + j \label{eqn:kij}
-\end{align}
-In our example, the virtual transmit antenna with $k=5$ corresponds to $(i,j)=(1,2)$. \\
-
+\subsection{Multi-Channel FMCW}
 Once the received signals are demultiplexed, the ideal receive signal for antenna pair $k \in \{0,1,...K-1\}$:
 \begin{align}
     y_k(t) & = \underline C_k e^{-j\dot\omega\tau_k t} \label{eq:ideal_scatterer}
@@ -337,15 +316,15 @@ for a given data size $n$, reduces the runtime of the regular DFT $\mathcal O(n^
 In \cite[pp. 509--513]{richards} explains the necessity of windowing when using the FFT.
 To summarize, the FFT works under the assumtion that its input time signal continues periodically before and after the supplied set of samples.
 Thus, any discontinuities between the first and last sample show in the spectrum as spectral leakage.
-This spectral leakage can mask weaker spectral components, as illustrated in \autoref{fig:richards_sidelobes}a.
+This spectral leakage can mask weaker spectral components, as illustrated in \cref{fig:richards_sidelobes}a.
 
 To address this issue, so-called \emph{window functions}, also known as \emph{tapering functions},
 can be applied to the input signal. These functions gradually reduce the amplitude of the signal at the edges,
 effectively fading it in and out. By doing so, they remove the discontinuities that cause spectral leakage,
-thus mitigating problems like masking, as illustrated in \autoref{fig:richards_sidelobes}b.
+thus mitigating problems like masking, as illustrated in \cref{fig:richards_sidelobes}b.
 \begin{figure}
     \centering
-    \includegraphics[width=\textwidth]{../../figures/richards_sidelobe_masking.pdf}
+    \includegraphics[width=\textwidth]{../figures/richards_sidelobe_masking.pdf}
     \caption{
         (a) Masking of a weak target response at $\hat f = 0$ by the sidelobes of a \SI{30}{\dB} stronger response at $\hat f = 0.2$.
         (b) Same two responses with Hamming window applied before the DTFT.
@@ -354,13 +333,61 @@ thus mitigating problems like masking, as illustrated in \autoref{fig:richards_s
 \end{figure}
 
 
+\subsection{Virtual Antenna Arrays}
+\label{sec:virtual_array}
+An important concept in analizing MIMO arrays is that of the \emph{virtual antenna array}:
+in a nutshell, the idea is to express the $N_{TX} \times N_{RX}$ MIMO array as an equivalent $1\times K$ SIMO array,
+enabling analysis through conventional methods for antenna arrays \cite{virtual_antenna_arrays}.
+The procedure to construct the corresponding virtual array for a given MIMO array is as follows:
+
+The transmit antenna associated with channel $k=0$ is placed in the origin of the virtual array's coordinate system.
+Then, $K$ receive antennas are placed such that the displacement between them and the transmit antenna
+is the same as it was between the original MIMO array's corresponds transmit and receive antenna.
+It is possible for virtual antennas to overlap.
+As we will see later, the input signal under far-field conditions only depends
+on the relative displacement between the Tx- and Rx-antennas of a channel, and not their absolute positions.
+
+\begin{figure}
+    \begin{subfigure}{.4\textwidth}
+        \includegraphics[width=\textwidth]{../figures/drawio_3x4_MIMO.pdf}
+        \subcaption{MIMO array}
+        \label{fig:mimo_example}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{.4\textwidth}
+        \includegraphics[width=\textwidth]{../figures/drawio_1x12_SIMO.pdf}
+        \subcaption{Corresponding virtual array}
+        \label{fig:simo_example}
+    \end{subfigure}
+    \caption{Example Construction of a $1\times12$ virtual array from a $3\times4$ MIMO array}
+\end{figure}
+An example MIMO array and its corresponding virtual array can be seen in \cref{fig:mimo_example} and \cref{fig:simo_example}, respectively.
+The numbering convention for channel index $k$ corresponding to transmit antenna $i$ and receive antenna $j$,
+that is also used throughout the thesis, is as follows:
+\begin{align}
+    k = N_{Tx}i + j \label{eq:kij}
+\end{align}
+In our example, the virtual transmit antenna with $k=5$ corresponds to the physical antenna pair $(i,j)=(1,2)$. \\
+
+
 \section{Image Reconstruction}
-Image reconstruction is an inverse problem where the position $\vec r$ and RCS of the scatteres $\sigma$
+Image reconstruction is an inverse problem where the position $\vec r$ and the RCS of the scatteres $\sigma$
 has to be estimated from the received signals $y_k[m]$.
 A wide range of approaches is available.
-A common on spectral analysis of the signals enabled by the \emph{discrete Fourier transform (DFT)}.
-More flexibility is provided by backprojection (also known as the inverse Radon transform).
-More sophisticated algorithms include MUSIC, ESPRIT and PARAFAC.
+The conventional approach is based on spectral analysis of the signals,
+enabled by the \emph{discrete Fourier transform (DFT)}.
+More flexibility in terms of input and output requirements
+is provided by backprojection (also known as the inverse Radon transform).
+In the field of MIMO Radar imaging, offline \parencite{ren_three-dimensional_2021, farfield_bp}
+and online \parencite{realtime_bp} implementations show high potential for imaging.
+
+Typically used for MIMO radar sensors with fewer channels than our application
+is the sophisticated class of so-called superresolution algorithms
+\parencite{wang_2d_2021, odendaal_two-dimensional_1994,paulraj_estimation_1985,
+    information_department_naval_command_college_nanjing_210016_china_two-dimensional_2017,
+    seo_bayesian_2021, liu_sparse_2020, kim_joint_2015, gao_mimo-sar_2021,vasudevan_hierarchical_2019}.
+The approaches are often based on algorithms like MUSIC, ESPRIT and PARAFAC, or bayesian estimation theory,
+and require computationally intensive operations like the Singular Value Decomposition (SVD).
 
 In the following, three approaches and their application to
 the problem of image reconstruction for FMCW MIMO radar sensors are discussed.
@@ -376,7 +403,7 @@ obtaining a discrete output signal in spherical coordinates whose amplitude is a
 For each input channel, the range of a target can be estimated by applying the DFT over time.
 The resulting spectrum's peak corresponds to the target:
 \begin{align}
-    \mathcal{F}_m\{y_k[m]\}(\Omega) & = \sum_{m=0}^{M-1} e^{-j2\pi\frac{m\Omega}{M}} y_k[m]                                       \\
+    \mathcal{F}_m\{y_k[m]\}(\Omega) & = \sum_{m=0}^{M-1} e^{-j2\pi\frac{m\Omega}{M}} y_k[m]                                      \\
                                     & = \underline C_k(\vec r_S) \delta(\Omega-\dot \omega \tau_k(\vec r_S)T_s) \label{eq:y_fft}
 \end{align}
 
@@ -399,7 +426,7 @@ That means that a first-order approximation for the runtime can be used:
     \tau_k \approx \frac{2r_S + kd\sin\theta_S}{c_0}
 \end{align}
 
-In equation (\ref{eqn:G}), it can be seen that the channel gain $C_k(\vec r)$
+In equation (\ref{eq:G}), it can be seen that the channel gain $C_k(\vec r)$
 contains a phase shift depending on the runtime of the waves:
 \begin{align}
     \underline{C}_k(\vec r) & = C_k(\vec r_S)e^{-j\omega_0\tau_k}                            \\
@@ -440,7 +467,7 @@ The mean correlation of all channels to the theoretical signal is then used as a
     \hat F(\vec r) & = \frac{1}{K} \sum_{k=0}^{K-1} s_k[m, \vec r] \star y_k[m]             \\
                    & = \frac{1}{K}\sum_{k=0}^{K-1}\sum_{m=0}^{M} s_k^\ast[m, \vec r] y_k[m]
 \end{align}
-Using the signal model from (\ref*{eqn:ideal_scatterer}) yields:
+Using the signal model from (\ref*{eq:ideal_scatterer}) yields:
 \begin{align}
     \hat F(\vec r) & = \frac{1}{K}\sum_{k=0}^{K-1}\sum_{m=0}^{M}
     \underline C_k^\ast(\vec r)e^{+j\dot\omega\tau_k(\vec r_S)mT_s} y_k[m]
@@ -451,12 +478,12 @@ a hybrid approach\cite{realtime_bp} proposes that
 calculating the inner sum (over $m$) can be rewritten as an inverse discrete fourier transform (IDFT):
 
 \begin{align}
-    \hat F(\vec r) & = \frac{1}{K}\sum_{k=0}^{K-1}G_k^\ast(\vec r)
-    \sum_{m=0}^{M} e^{+j\dot\omega\tau_k(\vec r_S)mT_s} y_k[m]     \\
-                   & = \frac{1}{K}\sum_{k=0}^{K-1}G_k^\ast(\vec r)
+    \hat F(\vec r) & = \frac{1}{K}\sum_{k=0}^{K-1}\underline C_k^\ast(\vec r)
+    \sum_{m=0}^{M} e^{+j\dot\omega\tau_k(\vec r_S)mT_s} y_k[m]                \\
+                   & = \frac{1}{K}\sum_{k=0}^{K-1}\underline C_k^\ast(\vec r)
     \sum_{m=0}^{M} e^{j\Omega m} y_k[m]
-    \Big|_{\Omega=\dot\omega\tau_k(\vec r_S)T_s}                   \\
-                   & = \frac{1}{K}\sum_{k=0}^{K-1}G_k^\ast(\vec r)
+    \Big|_{\Omega=\dot\omega\tau_k(\vec r_S)T_s}                              \\
+                   & = \frac{1}{K}\sum_{k=0}^{K-1}\underline C_k^\ast(\vec r)
     \mathcal{F}_m^{-1} \left\{ y_k[m]\right\}(\Omega=\dot\omega\tau_k(\vec r_S)T_s)
 \end{align}
 

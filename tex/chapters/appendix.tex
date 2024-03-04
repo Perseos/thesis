@@ -1,6 +1,9 @@
 \chapter{Code}
 \section{Introduction to PyTorch Sensor Processing}
-\label{sec:pytorch_tutorial}
+\label{app:pytorch_tutorial}
+Pytorch is a machine learning framework that provides Tensor processing.
+A brief introduction of some of is features is provided here,
+the full documentation is available online \cite{pytorch}.
 Pytorch Tensors can be created from python lists,
 or with a utility function like \verb|zeros()|, \verb|ones()| or \verb|full()|:
 \lstset{
@@ -93,39 +96,30 @@ tensor(-16.3953)
     caption={PyTorch implementation of the FFT-based imaging algorithm},
     language=Python,
     firstline=3,
-    lastline=26,
     float,
     floatplacement=ht,
     label=lst:fft_img]{../figures/scripts/3.1_imaging/fft_example_impl.py}
 
 \lstinputlisting[
-    caption={PyTorch computation of a normalized FFT spectrum using a window function},
-    language=Python,
-    firstline=28,
-    float,
-    floatplacement=ht,
-    label=lst:window_fft]{../figures/scripts/3.1_imaging/fft_example_impl.py}
-
-\lstinputlisting[
     caption={PyTorch implementation of the backprojection imaging algorithm},
     language=Python,
     firstline=3,
-    lastline=26,
+    lastline=24,
     float,
     floatplacement=ht,
     label=lst:bp_img]{../figures/scripts/3.1_imaging/bp_example_impl.py}
 \lstinputlisting[
     caption={PyTorch computation of the channel-wise time of flight for a given position},
     language=Python,
-    firstline=28,
-    lastline=42,
+    firstline=26,
+    lastline=40,
     float,
     floatplacement=ht,
     label=lst:bp_tof]{../figures/scripts/3.1_imaging/bp_example_impl.py}
 \lstinputlisting[
     caption={PyTorch computation of uniformly spaced sample positions in different coordinate systems},
     language=Python,
-    firstline=44,
+    firstline=42,
     float,
     floatplacement=ht,
     label=lst:bp_pos]{../figures/scripts/3.1_imaging/bp_example_impl.py}
@@ -133,8 +127,8 @@ tensor(-16.3953)
 \lstinputlisting[
     caption={PyTorch implementation of the FFT-backprojection hybrid algorithm},
     language=Python,
-    lastline=28,
+    firstline=4,
+    lastline=30,
     float,
     floatplacement=ht,
     label=lst:hybrid_img]{../figures/scripts/3.1_imaging/hybrid_example_impl.py}
-\chapter{Additional Experiments}

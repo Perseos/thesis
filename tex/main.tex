@@ -6,7 +6,7 @@
 ]{biblatex}
 \addbibresource{../references/fundamentals.bib}
 \addbibresource{../references/imaging.bib}
-\usepackage{graphicx,caption,subcaption,tablefootnote,amsmath,amssymb,svg,hyperref,siunitx,trfsigns,listings,float}
+\usepackage{afterpage,amsmath,amssymb,booktabs,caption,hyperref,cleveref,float,graphicx,listings,siunitx,subcaption,svg,tablefootnote,tikz,trfsigns}
 \sisetup{exponent-product = \cdot}
 \DeclareSIUnit{\belrelative}{Br}
 \DeclareSIUnit{\dBr}{\deci\belrelative}
@@ -17,7 +17,7 @@
 \definecolor{codeteal}{rgb}{0.0,0.4,0.82}
 \definecolor{backcolour}{rgb}{0.95,0.95,0.95}
 
-\lstdefinestyle{mystyle}{
+\lstdefinestyle{mystyle}{ 
     backgroundcolor=\color{backcolour},
     commentstyle=\color{codegreen},
     keywordstyle=\color{codeteal},
