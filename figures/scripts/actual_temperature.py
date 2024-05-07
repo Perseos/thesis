@@ -12,7 +12,7 @@ f.set_figwidth(pdf.a4_textwidth)
 
 for key in temperatures.keys():
     stamps, temps = map(list, zip(*sorted(temperatures[key].items())))
-    ax.plot(stamps[:200], [t*1e-3 for t in temps[:200]], label=key)
+    ax.plot(stamps, [t*1e-3 for t in temps], label=key)
 
 ax.xaxis.set_major_formatter(tools.hhmm)
 ax.set_xlabel(r'$t$')
@@ -20,7 +20,7 @@ ax.set_ylabel(r'$\theta$ [°C]')
 ax.legend()
 ax.grid()
 
-f.set_figwidth(pdf.a4_textwidth)
-f.savefig('../actual_temperature.pdf')
+f.set_size_inches(pdf.a4_textwidth, 0.5*pdf.a4_textwidth)
+f.savefig('/home/dgotzens/Schreibtisch/actual_temperature.pdf')
 # f.show()
 # input()

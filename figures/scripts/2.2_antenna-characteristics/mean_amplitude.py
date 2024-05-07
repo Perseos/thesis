@@ -6,7 +6,7 @@ import pdfdefaults as pdf
 # setup
 pdf.setup()
 nfft = 2**10
-
+torch.Tensor.dBr = lambda self: 20*torch.log10(self/self.max())
 pi = 3.141592653589 
 maxdist = 50
 lightspeed = 299_792_458 
@@ -43,8 +43,8 @@ for m, measurement in enumerate(('a','d')):
         fft = torch.fft.fft(window[:,None,None]*data, n=nfft, dim=0)
         m_refl = fft[bp_start:bp_start+bp_len,:,:].abs().mean(1).argmax(0) + bp_start
         gain = fft.abs().mean(1)[m_refl, range(L)]
-        ax[m].plot(angle_deg, 20*gain.log10(), label=f'{dist}m')
-    ax[m].yaxis.set_major_formatter(EngFormatter('dBFS'))
+        ax[m].plot(angle_deg, gain.dBr(), label=f'{dist}m')
+    ax[m].yaxis.set_major_formatter(EngFormatter('dBr'))
     ax[m].set_ylabel('level')
     ax[m].set_xlabel('rotation')
     ax[m].xaxis.set_major_formatter(EngFormatter('°'))

@@ -1,0 +1,3 @@
+#!/bin/bash
+source /home/dgotzens/localstorage/workspace/masterarbeit/thesis/.venv/bin/activate
+LD_LIBRARY_PATH=/home/dgotzens/localstorage/workspace/masterarbeit/imcr-system/softfs/build/_ARTIFACT/SOFT/lib /home/dgotzens/localstorage/workspace/masterarbeit/imcr-system/softfs/build/_ARTIFACT/SOFT/bin/imcr_ilog_conversion --logfile-path="$1" | python /home/dgotzens/localstorage/workspace/masterarbeit/thesis/figures/scripts/2.2_antenna-characteristics/imcr_json_to_pkl.py ${1/.ifl.zst/}

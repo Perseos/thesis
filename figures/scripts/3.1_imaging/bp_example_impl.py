@@ -1,29 +1,27 @@
 import torch
 
 def calc_image_bp(data, settings, pos):
-    M,K,L = data.shape
-    PP = pos.shape
+    M,K = data.shape
+    PP = pos.shape[:-1]
 
     gain = settings['channel gain']                     # PP x K
     slope = settings['chirp slope']
     f0 = settings['start frequency']
     Ts = settings['sample period']
 
-    # Compute weights
-    tau = time_of_flight(settings, pos).unsqueeze(-2)   # PP x 1 x K
-    t = Ts*torch.arange(M)[:,None]                      # M x 1
 
-    freq = 2*torch.pi*slope*tau
-    phase = 2*torch.pi*f0*tau          
-    weights = gain.unsqueeze(-2) * \
-        torch.exp(1j*freq*t) * \
-        torch.exp(1j*phase)  # PP x M x K
+    #omegadot * tau * torch.arange(0,M)[:,None,None]*Ts + 1j*omega0*tau
+    # Compute weights
+    tau = time_of_flight(settings, pos)   # PP x K
+    frequency = 2*torch.pi*slope*tau
+    phase = 2*torch.pi*f0*tau
 
     # Compute 3D Images
-    imgs = torch.empty((*PP,L), dtype=torch.cfloat)
-    for l in range(L):
-        imgs[...,l] = (weights.conj() * data[:,:,l]).mean((-2,-1))
-    return imgs
+    img = torch.zeros(PP, dtype=torch.cfloat)
+    for m in range(M):
+        weight = gain * torch.exp(1j*phase) * torch.exp(1j*frequency*m*Ts) 
+        img += (weight.conj() * data[m,:]).sum(-1)
+    return img
 
 def time_of_flight(settings, pos):
     x_tx, x_rx = settings['x_tx'], settings['x_rx']
@@ -39,7 +37,7 @@ def time_of_flight(settings, pos):
     r_tx = (txpos-pos).square().sum(-1).sqrt()  
     r_rx = (rxpos-pos).square().sum(-1).sqrt()
     # sum(PPx1x3 - Kx3, -1) = PPxK
-    return (r_tx+r_rx)/c0
+    return (r_tx+r_rx)/c0  
 
 def calc_pos(settings):
     if settings['coordinate type'] == 'cartesian':
@@ -65,7 +63,6 @@ def calc_pos(settings):
         x = r[:,None,None] * theta[None,:,None].cos() * phi[None,None,:].sin()
         y = r[:,None,None] * theta[None,:,None].sin() * phi[None,None,:].sin()
         z = (r[:,None,None] * phi[None,:,None].cos()).expand(-1,Theta,-1) 
-    
     return torch.stack((x,y,z),-1)
 
         

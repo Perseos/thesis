@@ -27,7 +27,12 @@ for k in range(K):
         subdrift = drift[k,time.index(min(subtime)):time.index(max(subtime))+1]
 
         ax[0].plot(subtime, 20 * torch.log10(subdrift.abs()), color='k', linewidth=0.1)
-        ax[1].plot(subtime, 180/torch.pi * tools.unwrap(subdrift.angle()), color='k', linewidth=0.1)
+        if k==0:
+            ax[1].plot(subtime, 180/torch.pi * tools.unwrap(subdrift.angle()),\
+                 color='k', linewidth=0.1, label='ch0..191')
+        else:
+            ax[1].plot(subtime, 180/torch.pi * tools.unwrap(subdrift.angle()),\
+                 color='k', linewidth=0.1)
         # ax[1].scatter(time[:-1], 180/torch.pi * drift.angle(), color='k')
 for r in range(len(reboots)):
     subtime = [t for t in time if reboots[r] < t and (r+1==len(reboots) or t<reboots[r+1])]
